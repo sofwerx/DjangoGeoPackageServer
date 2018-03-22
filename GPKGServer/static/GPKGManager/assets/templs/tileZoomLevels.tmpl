@@ -1,0 +1,6 @@
+ <span style="font-size: 12px;" class="label">Zoom:</span>
+  {{#zooms}}
+  <input type="radio" name="zoomLevel" value="{{zoom}}" onchange="loadTiles('{{tableName}}', {{zoom}}, $(this).parent().find('.tiles'))"><span class="value" style="font-size: 12px;">{{zoom}}</span>
+  {{/zooms}}
+  <div class="tiles">
+  </div>

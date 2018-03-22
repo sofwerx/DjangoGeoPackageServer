@@ -18,6 +18,7 @@ from django.contrib import admin
 import views
 urlpatterns = [
     url(r'^$', views.home),
+    url(r'^prototype/$', views.prototype),
     url(r'^admin/', admin.site.urls),
     url(r'^GPKGManager/', include('GPKGManager.urls')),
 ]

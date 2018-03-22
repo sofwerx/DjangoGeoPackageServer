@@ -1,0 +1,8 @@
+.navigation-clean {
+    padding-top: .52rem;
+    padding-bottom: .52rem;
+}
+.scrollVert{
+	overflow-x: hidden;
+	overflow-y: scroll;
+}

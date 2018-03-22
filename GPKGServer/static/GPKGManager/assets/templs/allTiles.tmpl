@@ -1,0 +1,25 @@
+<div class="section">
+    <div class="item"><span class="label">West: </span><span class="value">{{west}}</span></div>
+    <div class="item"><span class="label">South: </span><span class="value">{{south}}</span></div>
+    <div class="item"><span class="label">East: </span><span class="value">{{east}}</span></div>
+    <div class="item"><span class="label">North: </span><span class="value">{{north}}</span></div>
+    <div class="item"><span class="label">Zoom: </span><span class="value">{{zoom}}</span></div>
+  </div>
+    <table onmouseout="clearHighlights()">
+      <thead>
+        <tr>
+          <th></th>
+          {{#columns}}
+            <th>{{name}}</th>
+          {{/columns}}
+        </tr>
+      </thead>
+      {{#tiles}}
+      <tr onmouseover="highlightTile({{minLongitude}}, {{minLatitude}}, {{maxLongitude}}, {{maxLatitude}}, '{{projection}}')" ondblclick="zoomToTile({{tile_column}}, {{tile_row}}, {{zoom_level}}, {{minLongitude}}, {{minLatitude}}, {{maxLongitude}}, {{maxLatitude}}, '{{projection}}', '{{tableName}}'); if($(this).find('.fa').hasClass('fa-circle-o')) {$(this).parent().find('.fa').removeClass('fa-check-circle').addClass('fa-circle-o')} $(this).find('.fa').toggleClass('fa-circle-o').toggleClass('fa-check-circle')">
+        <td><i class="fa fa-circle-o" onclick="zoomToTile({{tile_column}}, {{tile_row}}, {{zoom_level}}, {{minLongitude}}, {{minLatitude}}, {{maxLongitude}}, {{maxLatitude}}, '{{projection}}', '{{tableName}}'); if ($(this).hasClass('fa-circle-o')) { $(this).parent().parent().parent().find('.fa-check-circle').removeClass('fa-check-circle').addClass('fa-circle-o');}$(this).toggleClass('fa-circle-o').toggleClass('fa-check-circle')"></i></td>
+        {{#values}}
+          <td>{{.}}</td>
+        {{/values}}
+      </tr>
+      {{/tiles}}
+    </table>

@@ -11,4 +11,9 @@ from django.contrib.auth.models import User, UserManager
 @csrf_protect
 def home(request):
 	c = {}
+	return render(request, 'homePageWorking.html', c)
+
+@csrf_protect
+def prototype(request):
+	c = {}
 	return render(request, 'homePage.html', c)
