@@ -15,10 +15,15 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-import views
+from django.conf.urls.static import static
+
+import views, settings
 urlpatterns = [
     url(r'^$', views.home),
+    url(r'^retrieve/$', views.retrieveGPKG),
+    url(r'^createGeoPackage/$', views.createGeoPackage),
     url(r'^prototype/$', views.prototype),
     url(r'^admin/', admin.site.urls),
     url(r'^GPKGManager/', include('GPKGManager.urls')),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

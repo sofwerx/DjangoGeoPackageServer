@@ -81,15 +81,17 @@ window.downloadGeoJSON = function(tableName) {
 
 window.loadGeoPackage = function(files) {
   var f = files[0];
+  console.log(f);
   fileName = f.name;
   $('#choose-label').find('i').toggle();
   $('#choose-label').find('span').text(f.name);
   $('#status').removeClass('gone');
 
   var r = new FileReader();
+  var uploadReader = new FileReader();
   r.onload = function() {
     var array = new Uint8Array(r.result);
-
+	//var blobString = new Blob(r.result);
     // if it is a GeoPackage file
     if (f.name.lastIndexOf('gpkg') === f.name.lastIndexOf('.')+1) {
       ga('send', {
@@ -249,7 +251,63 @@ window.loadGeoPackage = function(files) {
       });
     }
   }
+  /*uploadReader.onload = function() {
+    //var array = ;
+	  console.log("Uploading the File");
+	  $.ajax({
+		  type: "POST",
+		  url: "/GPKGManager/GPKGManager/geopackage/create/",
+		  data: {"Data":uploadReader.result,"name":f.name,"Token":f.name},
+		  success: function(json){
+			  console.log("Successful Save");
+			 //console.log(json);
+		  },
+		});
+	  console.log("File Uploaded");
+  }*/
   r.readAsArrayBuffer(f);
+  //uploadReader.readAsText(f);
+    var data = new FormData();
+	jQuery.each(jQuery('#file')[0].files, function(i, file) {
+		data.append('file-'+i, file);
+	});
+	data.append("Name", jQuery('#file')[0].files[0].name);
+	jQuery.ajax({
+		url: '/createGeoPackage/',
+		data: data,
+		cache: false,
+		contentType: false,
+		processData: false,
+		method: 'POST',
+		type: 'POST', // For jQuery < 1.9
+		success: function(data){
+			//alert(data);
+			//console.log(data);
+			$("#listOfPackages").append($("<li>",{"class":"list-group-item","onclick":"loadSavedPackage("+data.name + ")"}).text(data.name))
+		},
+		xhr: function () {
+			var myXhr = $.ajaxSettings.xhr();
+			if (myXhr.upload) {
+				myXhr.upload.addEventListener('progress', function (event) {
+					var percent = 0;
+					var position = event.loaded || event.position;
+					var total = event.total;
+					var progress_bar_id = "#progress-wrp";
+					if (event.lengthComputable) {
+						percent = Math.ceil(position / total * 100);
+					}
+					console.log(percent);
+  					var elem = document.getElementById("myBar"); 
+  					var cont = document.getElementById("myProgress"); 
+					elem.style.width = percent + '%'; 
+					elem.innerHTML = percent * 1  + '%';
+					cont.style.display = (percent<100)?"visible":"none";
+				}, false);
+			}
+			return myXhr;
+		},
+	});
+	$("#EdittingTab").click();
 }
 
 function clearInfo() {
@@ -357,9 +415,9 @@ window.toggleLayer = function(layerType, table) {
         canvas.width = size.x;
         canvas.height = size.y;
         setTimeout(function() {
-          console.time('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
+          //console.time('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
           GeoPackageAPI.drawXYZTileInCanvas(geoPackage, table, tilePoint.x, tilePoint.y, tilePoint.z, size.x, size.y, canvas, function(err) {
-            console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
+            //console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
             done(err, canvas);
           });
         }, 0);
@@ -465,7 +523,7 @@ window.loadUrl = function(url, loadingElement, gpName) {
     eventAction: 'load'
   });
   fileName = url.split('/').pop();
-  loadingElement.toggle();
+  //loadingElement.toggle();
   var xhr = new XMLHttpRequest();
   xhr.open('GET', url, true);
   xhr.responseType = 'arraybuffer';
@@ -477,7 +535,7 @@ window.loadUrl = function(url, loadingElement, gpName) {
     loadByteArray(uInt8Array, function() {
       $('#download').removeClass('gone');
       $('#choose-label').find('i').toggle();
-      loadingElement.toggle();
+      //loadingElement.toggle();
     });
   };
   xhr.send();

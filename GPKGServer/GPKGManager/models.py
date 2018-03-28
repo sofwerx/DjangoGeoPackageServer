@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth import models as auth_models
 from django.db import models as models
 from django_extensions.db import fields as extension_fields
-
+import base64
 
 class GeoPackage(models.Model):
 
@@ -18,7 +18,7 @@ class GeoPackage(models.Model):
     created = models.DateTimeField(auto_now_add=True, editable=False)
     last_updated = models.DateTimeField(auto_now=True, editable=False)
     Token = models.TextField(max_length=128)
-
+    File = models.FileField(upload_to='geopackages/', null=True)
 
     class Meta:
         ordering = ('-created',)
@@ -32,5 +32,6 @@ class GeoPackage(models.Model):
 
     def get_update_url(self):
         return reverse('GPKGManager_geopackage_update', args=(self.slug,))
-
-
+    
+    def get_data(self):
+        return self.Data.encode('utf-8')
