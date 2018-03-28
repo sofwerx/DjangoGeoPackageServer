@@ -33,11 +33,12 @@ var map = L.map('map', {
 
 map.addControl(new L.Control.ZoomIndicator());
 
-var baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+var baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
   attribution: '© <a href="https://www.mapbox.com/map-feedback/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>'
 });
-baseLayer.addTo(map);
 
+baseLayer.on("load",function(){console.log("Base Map Loaded");$('body').addClass('loaded');baseLayer.off('load')});
+baseLayer.addTo(map);
 var geoPackage;
 var tableLayers;
 var imageOverlay;
@@ -307,7 +308,7 @@ window.loadGeoPackage = function(files) {
 			return myXhr;
 		},
 	});
-	$("#EdittingTab").click();
+	$("#EdittingTab")[0].click();
 }
 
 function clearInfo() {

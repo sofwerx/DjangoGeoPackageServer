@@ -11,6 +11,7 @@
 	<!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/leaflet.css">-->
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"/>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/css/mdb.min.css">	
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css">	
 	<link rel="stylesheet" href="/static/GPKGManager/assets/css/styles.min.css">
 	<link rel="stylesheet" href="/static/GPKGManager/assets/css/app.css">
 	<link rel="stylesheet" href="/static/custom/css/styles.css">
@@ -36,6 +37,14 @@
 		</nav>
 	</div>
 	<div class="row" style="height:calc(100vh - 130px);width:100vw;margin:0;/*padding:0;*/">
+		
+		<div id="loader-wrapper">
+			<div id="loader"></div>
+
+			<div class="loader-section section-left"></div>
+            <div class="loader-section section-right"></div>
+
+		</div>
 		<div class="col-lg-5" style="padding:0px;"><div id="map"></div></div>
 		<div class="col scrollVert" style="padding:0;margin:0;">
 			<div>
@@ -54,7 +63,7 @@
 						</div>
 						</div>
 						<hr>
-						<h3>List of Saved Geopackages</h3>
+						<h3 class="col-xs-12 text-center">List of Saved Geopackages</h3>
 						<ul class="list-group" id="listOfPackages">
 						  {% for gpkg in geopackages %}<li class="list-group-item" onclick="loadSavedPackage({{gpkg.id}})">{{gpkg.name | title}}</li>{% endfor %}
 						</ul>
@@ -87,6 +96,7 @@
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.bundle.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/js/mdb.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.2/pagination.min.js"></script>
 
 	<script src="/static/GPKGManager/assets/js/gp.js"></script>    
 	<script src="/static/GPKGManager/assets/js/common.js"></script>    
@@ -107,78 +117,50 @@
 	  <div class="tab active" style="display: inline-block;" onclick="$(this).parent().find('.metadata').show(); $(this).parent().find('.features').hide();; $(this).parent().find('.tab').toggleClass('active');">Metadata</div>
 	  <div class="tab" style="display: inline-block;" onclick="$(this).parent().find('.features').show(); $(this).parent().find('.metadata').hide(); loadFeatures('{{tableName}}', $(this).parent().find('.features')); $(this).parent().find('.tab').toggleClass('active');">Features</div>
 	  <div class="metadata">
-		<div class="srs">
-		  <div class="section-title">Features Spatial Reference System</div>
-		  <div class="section">
-			<div class="item"><span class="label">SRS Name: </span><span class="value">{{srs.name}}</span></div>
-			<div class="item"><span class="label">SRS ID: </span><span class="value">{{srs.id}}</span></div>
-			<div class="item"><span class="label">Organization: </span><span class="value">{{srs.organization}}</span></div>
-			<div class="item"><span class="label">Coordsys ID: </span><span class="value">{{srs.organization_coordsys_id}}</span></div>
-			<div class="item"><span class="label">Definition: </span><span class="value">{{srs.definition}}</span></div>
-			<div class="item"><span class="label">Description: </span><span class="value">{{srs.description}}</span></div>
-		  </div>
-		</div>
 		<div class="contents">
-		  <div class="section-title">Contents</div>
+		  <div class="section-title"><h4>Description</h4></div>
 		  <div class="section">
-			<div class="item"><span class="label">Table Name: </span><span class="value">{{contents.tableName}}</span></div>
-			<div class="item"><span class="label">Data Type: </span><span class="value">{{contents.dataType}}</span></div>
-			<div class="item"><span class="label">Identifier: </span><span class="value">{{contents.identifier}}</span></div>
-			<div class="item"><span class="label">Description: </span><span class="value">{{contents.description}}</span></div>
-			<div class="item"><span class="label">Last Change: </span><span class="value">{{contents.lastChange}}</span></div>
-			<div class="item"><span class="label">Min X: </span><span class="value">{{contents.minX}}</span></div>
-			<div class="item"><span class="label">MinY: </span><span class="value">{{contents.minY}}</span></div>
-			<div class="item"><span class="label">Max X: </span><span class="value">{{contents.maxX}}</span></div>
-			<div class="item"><span class="label">Max Y: </span><span class="value">{{contents.maxY}}</span></div>
-			<div class="srs">
-			  <div class="section-title">Contents Spatial Reference System</div>
-			  <div class="section">
-				<div class="item"><span class="label">SRS Name: </span><span class="value">{{contents.srs.name}}</span></div>
-				<div class="item"><span class="label">SRS ID: </span><span class="value">{{contents.srs.id}}</span></div>
-				<div class="item"><span class="label">Organization: </span><span class="value">{{contents.srs.organization}}</span></div>
-				<div class="item"><span class="label">Coordsys ID: </span><span class="value">{{contents.srs.organization_coordsys_id}}</span></div>
-				<div class="item"><span class="label">Definition: </span><span class="value">{{contents.srs.definition}}</span></div>
-				<div class="item"><span class="label">Description: </span><span class="value">{{contents.srs.description}}</span></div>
-			  </div>
-			</div>
+			<p>{{contents.description}}</p>
 		  </div>
 		</div>
+		
 		<div class="geometryColumns">
-		  <div class="section-title">Geometry Columns</div>
+		  <div class="section-title"><h4>Geometry Columns</h4></div>
 		  <div class="section">
-			<div class="item"><span class="label">Table Name: </span><span class="value">{{geometryColumns.tableName}}</span></div>
-			<div class="item"><span class="label">Column Name: </span><span class="value">{{geometryColumns.columnName}}</span></div>
 			<div class="item"><span class="label">Geometry Type Name: </span><span class="value">{{geometryColumns.geometryTypeName}}</span></div>
-			<div class="item"><span class="label">Z: </span><span class="value">{{geometryColumns.z}}</span></div>
-			<div class="item"><span class="label">M: </span><span class="value">{{geometryColumns.m}}</span></div>
 		  </div>
 		</div>
 		<div class="columns">
-		  <div class="section-title">{{tableName}} columns:</div>
-		  <div class="section">
-			{{#columns}}
-			<div class="column">
-			  <div class="item"><span class="label">Index: </span><span class="value">{{index}}</span></div>
-			  <div class="item"><span class="label">Name: </span><span class="value">{{name}}</span></div>
-			  <div class="item"><span class="label">Data Type: </span><span class="value">{{dataType}}</span></div>
-			  <div class="item"><span class="label">Max: </span><span class="value">{{max}}</span></div>
-			  <div class="item"><span class="label">Not Null: </span><span class="value">{{notNull}}</span></div>
-			  <div class="item"><span class="label">Default Value: </span><span class="value">{{defaultValue}}</span></div>
-			  <div class="item"><span class="label">Primary Key: </span><span class="value">{{primaryKey}}</span></div>
-			  {{#dataColumn}}
-			  <div class="section-title">Data Column:</div>
-			  <div class="section">
-				<div class="dataColumn">
-				  <div class="item"><span class="label">Name: </span><span class="value">{{dataColumn.name}}</span></div>
-				  <div class="item"><span class="label">Title: </span><span class="value">{{dataColumn.title}}</span></div>
-				  <div class="item"><span class="label">Description: </span><span class="value">{{dataColumn.description}}</span></div>
-				  <div class="item"><span class="label">Mime Type: </span><span class="value">{{dataColumn.mime_type}}</span></div>
-				</div>
-			  </div>
-			  {{/dataColumn}}
-			</div>
-			{{/columns}}
-		  </div>
+		  <div class="section-title"><h4>Columns</h4></div>
+		  <table class="table">
+			  <thead>
+				<tr>
+				  <th scope="col">Index</th>
+				  <th scope="col">Name</th>
+				  <th scope="col">Type</th>
+				  <th scope="col">Required</th>
+				</tr>
+			  </thead>
+			  <tbody>
+				{{#columns}}
+			  	<tr>
+					<th>{{index}}</th>
+					<th>{{name}}</th>
+					<th>{{dataType}}</th>
+					<th>{{notNull}}</th>
+				</tr>
+				
+				  {{#dataColumn}}
+				  <tr>
+					  <th>Data Name: {{dataColumn.name}}</th>
+					  <th>Data Title: {{dataColumn.title}}</th>
+					  <th>Data Description: {{dataColumn.description}}</th>
+					  <th>Data Type: {{dataColumn.mime_type}}</th>
+				  </tr>
+				  {{/dataColumn}}
+				{{/columns}}
+			  </tbody>
+			</table>
 		</div>
 	  </div>
 	  <div class="features" style="display: none;">
@@ -223,7 +205,7 @@
 	  <div class="tab tile-tab" style="display: inline-block;" onclick="$(this).parent().find('.tileListing').show(); $(this).parent().find('.metadata').hide(); loadZooms('{{tableName}}', $(this).parent().find('.tileListing')); $(this).parent().find('.tile-tab').addClass('active'); $(this).parent().find('.metadata-tab').removeClass('active'); registerTileTable('{{tableName}}', $(this).parent().find('.tileListing'));">Tiles</div>
 	  <div class="metadata">
 		<div class="tiles">
-		  <div class="section-title">Tile Information</div>
+		  <div class="section-title"><h4>Tile Information</h4></div>
 		  <div class="section">
 			<div class="item"><span class="label">Total Tiles: </span><span class="value">{{count}}</span></div>
 			<div class="item"><span class="label">Zoom Levels: </span><span class="value">{{zoomLevels}}</span></div>
@@ -231,56 +213,33 @@
 			<div class="item"><span class="label">Max Zoom: </span><span class="value">{{maxZoom}}</span></div>
 		  </div>
 		</div>
-		<div class="srs">
-		  <div class="section-title">Tile Matrix Spatial Reference System</div>
-		  <div class="section">
-			<div class="item"><span class="label">SRS Name: </span><span class="value">{{srs.name}}</span></div>
-			<div class="item"><span class="label">SRS ID: </span><span class="value">{{srs.id}}</span></div>
-			<div class="item"><span class="label">Organization: </span><span class="value">{{srs.organization}}</span></div>
-			<div class="item"><span class="label">Coordsys ID: </span><span class="value">{{srs.organization_coordsys_id}}</span></div>
-			<div class="item"><span class="label">Definition: </span><span class="value">{{srs.definition}}</span></div>
-			<div class="item"><span class="label">Description: </span><span class="value">{{srs.description}}</span></div>
-		  </div>
-		</div>
+		
 		<div class="contents">
-		  <div class="section-title">Contents</div>
+		  <div class="section-title"><h4>Description</h4></div>
 		  <div class="section">
-			<div class="item"><span class="label">Table Name: </span><span class="value">{{contents.tableName}}</span></div>
-			<div class="item"><span class="label">Data Type: </span><span class="value">{{contents.dataType}}</span></div>
-			<div class="item"><span class="label">Identifier: </span><span class="value">{{contents.identifier}}</span></div>
-			<div class="item"><span class="label">Description: </span><span class="value">{{contents.description}}</span></div>
-			<div class="item"><span class="label">Last Change: </span><span class="value">{{contents.lastChange}}</span></div>
-			<div class="item"><span class="label">Min X: </span><span class="value">{{contents.minX}}</span></div>
-			<div class="item"><span class="label">Min Y: </span><span class="value">{{contents.minY}}</span></div>
-			<div class="item"><span class="label">Max X: </span><span class="value">{{contents.maxX}}</span></div>
-			<div class="item"><span class="label">Max Y: </span><span class="value">{{contents.maxY}}</span></div>
-			<div class="srs">
-			  <div class="section-title">Contents Spatial Reference System</div>
-			  <div class="section">
-				<div class="item"><span class="label">SRS Name: </span><span class="value">{{contents.srs.name}}</span></div>
-				<div class="item"><span class="label">SRS ID: </span><span class="value">{{contents.srs.id}}</span></div>
-				<div class="item"><span class="label">Organization: </span><span class="value">{{contents.srs.organization}}</span></div>
-				<div class="item"><span class="label">Coordsys ID: </span><span class="value">{{contents.srs.organization_coordsys_id}}</span></div>
-				<div class="item"><span class="label">Definition: </span><span class="value">{{contents.srs.definition}}</span></div>
-				<div class="item"><span class="label">Description: </span><span class="value">{{contents.srs.description}}</span></div>
-			  </div>
-			</div>
+			<p>{{contents.description}}</p>
 		  </div>
 		</div>
 		<div class="columns">
-		  <div class="section-title">{{tableName}} columns:</div>
-		  <div class="section">
-			{{#columns}}
-			<div class="column">
-			  <div class="item"><span class="label">Index: </span><span class="value">{{index}}</span></div>
-			  <div class="item"><span class="label">Name: </span><span class="value">{{name}}</span></div>
-			  <div class="item"><span class="label">Max: </span><span class="value">{{max}}</span></div>
-			  <div class="item"><span class="label">Not Null: </span><span class="value">{{notNull}}</span></div>
-			  <div class="item"><span class="label">Default Value: </span><span class="value">{{defaultValue}}</span></div>
-			  <div class="item"><span class="label">Primary Key: </span><span class="value">{{primaryKey}}</span></div>
-			</div>
-			{{/columns}}
-		  </div>
+		  <div class="section-title"><h4>Columns</h4></div>
+		  <table class="table">
+			  <thead>
+				<tr>
+				  <th scope="col">Index</th>
+				  <th scope="col">Name</th>
+				  <th scope="col">Required</th>
+				</tr>
+			  </thead>
+			  <tbody>
+				{{#columns}}
+			  	<tr>
+					<th>{{index}}</th>
+					<th>{{name}}</th>
+					<th>{{notNull}}</th>
+				</tr>
+				{{/columns}}
+			  </tbody>
+			</table>
 		</div>
 	  </div>
 	  <div class="section-title">Tiles in the current map view (zoom and pan in the map to see other tiles)</div>

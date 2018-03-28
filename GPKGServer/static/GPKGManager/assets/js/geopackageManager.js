@@ -39,7 +39,7 @@ function stringToBytes(str)
 function loadSavedPackage(id){
 	console.log("You loaded geopackage #" + id);
 	
-	$("#EdittingTab").click();
+	$("#EdittingTab")[0].click();
 	$.ajax({
 		  type: "Get",
 		  url: "/retrieve/?id=" + id,
