@@ -12,6 +12,7 @@
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"/>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/css/mdb.min.css">	
 	<link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css">	
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">	
 	<link rel="stylesheet" href="/static/GPKGManager/assets/css/styles.min.css">
 	<link rel="stylesheet" href="/static/GPKGManager/assets/css/app.css">
 	<link rel="stylesheet" href="/static/custom/css/styles.css">
@@ -65,10 +66,16 @@
 						<hr>
 						<h3 class="col-xs-12 text-center">List of Saved Geopackages</h3>
 						<ul class="list-group" id="listOfPackages">
-						  {% for gpkg in geopackages %}<li class="list-group-item" onclick="loadSavedPackage({{gpkg.id}})">{{gpkg.name | title}}</li>{% endfor %}
+						  {% for gpkg in geopackages %}<li class="list-group-item waves-effec" onclick="loadSavedPackage({{gpkg.id}})">{{gpkg.name | title}}</li>{% endfor %}
 						</ul>
 					</div>
 					<div class="tab-pane" role="tabpanel" id="tab-2">
+						<div id="parsingTaskCont" class="pt-1 text-center col-xs-12">
+							<h4 class="muted">Downloading your Geopackage Now</h4>
+							<div class="progress text-center" >
+							  <div class="progress-bar progress-bar-striped progress-bar-animated active w-0" role="progressbar"  id="parsingTaskProgress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+							</div>
+						</div>
 						<div id="information" class="information hidden">
 						  <hr>
 						  <div class="tableGroup">
@@ -97,6 +104,9 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.bundle.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/js/mdb.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.2/pagination.min.js"></script>
+	
+	<script src="https://unpkg.com/popper.js/dist/umd/popper.min.js"></script>
+	<script src="https://unpkg.com/popper.js/dist/umd/tooltip.min.js"></script>
 
 	<script src="/static/GPKGManager/assets/js/gp.js"></script>    
 	<script src="/static/GPKGManager/assets/js/common.js"></script>    
@@ -110,7 +120,7 @@
 		<span class="onoffswitch-inner"></span>
 	  </label>
 	</div>
-	<div id="feature-{{tableName}}" class="table-name" style="display: inline-block;">Feature Table: {{tableName}} (<span class="count">{{count}}</span>) <a  href="javascript:void(0);" class="btn btn-info text-center" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{contents.srs.organization}}:{{contents.srs.organization_coordsys_id}}')"><i class="fa fa-search"></i></a><a style="padding-left: 7px" href="javascript:void(0);" onclick="downloadGeoJSON('{{tableName}}')">Download Layer as GeoJSON</a></div>
+	<div id="feature-{{tableName}}" class="table-name" style="display: inline-block;">Feature Table: {{tableName}} (<span class="count">{{count}}</span>) <a  href="javascript:void(0);" class="btn btn-info text-center p-2 btn-rounded" data-toggle="tooltip" data-placement="top" title="Click to Zoom on Map" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{contents.srs.organization}}:{{contents.srs.organization_coordsys_id}}')"><i class="fa fa-search"></i></a><a style="padding-left: 7px" href="javascript:void(0);" onclick="downloadGeoJSON('{{tableName}}')">Download Layer as GeoJSON</a></div>
 	<br>
 	<a class="btn col-12 btn-info p-1" href="javascript:void(0);" onclick="$(this).next().toggle()">Edit Layer</a>
 	<div class="table" style="display: none;">
@@ -197,7 +207,7 @@
 		<span class="onoffswitch-inner"></span>
 	  </label>
 	</div>
-	<div id="tile-{{tableName}}" class="table-name pt-0" style="display: inline-block;"><h4>{{tableName}} (<span class="small">Zoom: {{minZoom}} - {{maxZoom}}</span>)  <a href="javascript:void(0);" class="btn btn-info text-center" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{contents.srs.organization}}:{{contents.srs.organization_coordsys_id}}')"><i class="fa fa-search"></i></a></h4></div>
+	<div id="tile-{{tableName}}" class="table-name pt-0" style="display: inline-block;"><h4>{{tableName}} (<span class="small">Zoom: {{minZoom}} - {{maxZoom}}</span>)  <a href="javascript:void(0);" class="btn btn-info text-center p-2 btn-rounded" data-toggle="tooltip" data-placement="top" title="Click to Zoom on Map" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{contents.srs.organization}}:{{contents.srs.organization_coordsys_id}}')"><i class="fa fa-search"></i></a></h4></div>
 	<br>
 	<a class="btn col-12 btn-info p-1" href="javascript:void(0);" onclick="$(this).next().toggle()">Edit Layer</a>
 	<div class="table" style="display: none;">
@@ -278,7 +288,9 @@
 	</table>
   </script>{% endverbatim %}
 	<script>
-
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
 	</script>
 </body>
 </html>

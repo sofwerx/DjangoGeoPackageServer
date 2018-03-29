@@ -1,3 +1,9 @@
+/*
+TODO:
+Change Templates to have their own generators, maybe make a templating object for easier table type addition.
+Change Logic of the feature and tile loads for faster response times
+Change implementation of templating generation for smoother UI experience (allowing timeouts for UI updates)
+*/
 (function (window, document, undefined) {
 
   L.Control.ZoomIndicator = L.Control.extend({
@@ -39,6 +45,7 @@ var baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.p
 
 baseLayer.on("load",function(){console.log("Base Map Loaded");$('body').addClass('loaded');baseLayer.off('load')});
 baseLayer.addTo(map);
+
 var geoPackage;
 var tableLayers;
 var imageOverlay;
@@ -46,6 +53,8 @@ var currentTile = {};
 var tableInfos;
 var fileName;
 
+// Save GPKG Function
+/* The next two functions are Downloading the geopackage by exporting and transforming the data in the geopackage into a Blob*/
 var saveByteArray = (function () {
     var a = document.createElement("a");
     document.body.appendChild(a);
@@ -67,6 +76,7 @@ window.saveGeoPackage = function() {
   });
 }
 
+// Save GeoJSON Function
 window.downloadGeoJSON = function(tableName) {
   GeoJSONToGeoPackage.extract(geoPackage, tableName, function(err, geoJson) {
     var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(geoJson));
@@ -80,6 +90,9 @@ window.downloadGeoJSON = function(tableName) {
   });
 }
 
+//Load GeoPackage
+/*  This function parses common files and assembles data into a useable geopackage format
+	There is also a custom function that uploads the package to the server, this logic should be seperated later*/
 window.loadGeoPackage = function(files) {
   var f = files[0];
   console.log(f);
@@ -252,20 +265,6 @@ window.loadGeoPackage = function(files) {
       });
     }
   }
-  /*uploadReader.onload = function() {
-    //var array = ;
-	  console.log("Uploading the File");
-	  $.ajax({
-		  type: "POST",
-		  url: "/GPKGManager/GPKGManager/geopackage/create/",
-		  data: {"Data":uploadReader.result,"name":f.name,"Token":f.name},
-		  success: function(json){
-			  console.log("Successful Save");
-			 //console.log(json);
-		  },
-		});
-	  console.log("File Uploaded");
-  }*/
   r.readAsArrayBuffer(f);
   //uploadReader.readAsText(f);
     var data = new FormData();
@@ -311,6 +310,8 @@ window.loadGeoPackage = function(files) {
 	$("#EdittingTab")[0].click();
 }
 
+//Clear Info
+/* This function clears the map and the data structures that hold geopackage information */
 function clearInfo() {
   var tileTableNode = $('#tile-tables');
   tileTableNode.empty();
@@ -327,6 +328,8 @@ function clearInfo() {
   $('#information').removeClass('hidden').addClass('visible');
 }
 
+//Load Byte Array
+/*This is a helper function to clear the map and open the new geopackage*/
 function loadByteArray(array, callback) {
   clearInfo();
 
@@ -336,6 +339,9 @@ function loadByteArray(array, callback) {
   });
 }
 
+//Read GeoPackage
+/*This function iterates through the Feature and Tile daos and retrieves their information
+  It also starts to render the templates for the tables */
 function readGeoPackage(callback) {
   tableInfos = {};
   var featureTableTemplate = $('#feature-table-template').html();
@@ -381,6 +387,7 @@ function readGeoPackage(callback) {
   ], callback);
 }
 
+/*This function zooms to the bounding box of an object*/
 window.zoomTo = function(minX, minY, maxX, maxY, projection) {
   try {
     var sw = proj4(projection, 'EPSG:4326', [minX, minY]);
@@ -391,6 +398,9 @@ window.zoomTo = function(minX, minY, maxX, maxY, projection) {
   }
 }
 
+//Toggle Layer
+/* This function is toggling the views of the Layer
+We may change the logic of this stop the deletion of objects that are unused, but this will lead to memory issues if not managed carefully */
 window.toggleLayer = function(layerType, table) {
   if (tableLayers[table]) {
     map.removeLayer(tableLayers[table]);
@@ -468,6 +478,8 @@ window.toggleLayer = function(layerType, table) {
   }
 }
 
+//Marker Generation for Features
+/* The next three functions are defining how to generate the looks for points */
 function pointToLayer(feature, latlng) {
   // just key off of marker-symbol, otherwise create a circle marker
   if (feature.properties.hasOwnProperty('marker-symbol')) {
@@ -517,6 +529,9 @@ function featureStyle(feature) {
   };
 }
 
+//Load from URL
+/* This function is defining the loading process from the url
+We may add a listener to update the user on the loading process */
 window.loadUrl = function(url, loadingElement, gpName) {
   ga('send', {
     hitType: 'event',
@@ -526,6 +541,7 @@ window.loadUrl = function(url, loadingElement, gpName) {
   fileName = url.split('/').pop();
   //loadingElement.toggle();
   var xhr = new XMLHttpRequest();
+  console.log(xhr);
   xhr.open('GET', url, true);
   xhr.responseType = 'arraybuffer';
 
@@ -539,9 +555,26 @@ window.loadUrl = function(url, loadingElement, gpName) {
       //loadingElement.toggle();
     });
   };
+	xhr.onprogress = function(event){
+		var percent = 0;
+		var position = event.loaded || event.position;
+		var total = event.total;
+		if (event.lengthComputable) {
+			percent = Math.ceil(position / total * 100);
+		}
+		$('#parsingTaskProgress').css('width', percent+'%').attr('aria-valuenow', percent);
+		//console.log(percent);
+		if(percent != 100){
+			$('#parsingTaskCont').css("display","block");
+		}else{
+			$('#parsingTaskCont').css("display","none");
+		}
+	};
   xhr.send();
 }
 
+//Load Tiles based on Zoom
+/* This will start parsing the data for any visible tiles on the same zoom level */
 window.loadZooms = function(tableName, tilesElement) {
   var zoomsTemplate = $('#tile-zoom-levels-template').html();
   Mustache.parse(zoomsTemplate);
@@ -581,6 +614,8 @@ map.on('moveend', function() {
   }
 });
 
+//Load Tiles
+/*This is Loading the Tiles from visibleTileTables*/
 window.loadTiles = function(tableName, zoom, tilesElement) {
   //map.setZoom(zoom);
   var mapBounds = map.getBounds();
@@ -602,6 +637,8 @@ window.loadTiles = function(tableName, zoom, tilesElement) {
   });
 }
 
+//Zoom Tile
+/*This function will get the bounding box of a tile and pan to it on the map*/
 window.zoomToTile = function(tileColumn, tileRow, zoom, minLongitude, minLatitude, maxLongitude, maxLatitude, projection, tableName) {
   if (imageOverlay) map.removeLayer(imageOverlay);
   if (tileColumn === currentTile.tileColumn
@@ -634,6 +671,8 @@ window.zoomToTile = function(tileColumn, tileRow, zoom, minLongitude, minLatitud
   });
 }
 
+//Highlight Tile
+/*This function will get the bounding box of a tile and display it on the map*/
 window.highlightTile = function(minLongitude, minLatitude, maxLongitude, maxLatitude, projection) {
 
   var sw = proj4(projection, 'EPSG:4326', [minLongitude, minLatitude]);
@@ -656,6 +695,7 @@ window.highlightTile = function(minLongitude, minLatitude, maxLongitude, maxLati
   highlightLayer.addData(poly);
   highlightLayer.bringToFront();
 }
+
 
 window.loadFeatures = function(tableName, featuresElement) {
   var featuresTableTemplate = $('#all-features-template').html();
@@ -685,6 +725,26 @@ window.loadFeatures = function(tableName, featuresElement) {
     var rendered = Mustache.render(featuresTableTemplate, features);
     featuresElement.empty();
     featuresElement.append(rendered);
+	var currentPage = 0;
+	var numPerPage = 10;
+	var $table = $(featuresElement);
+	$(featuresElement).bind('repaginate', function() {
+		$(featuresElement).find('tbody tr').hide().slice(currentPage * numPerPage, (currentPage + 1) * numPerPage).show();
+	});
+	$(featuresElement).trigger('repaginate');
+	var numRows = $(featuresElement).find('tbody tr').length;
+	var numPages = Math.ceil(numRows / numPerPage);
+	var $pager = $('<div class="pager"></div>');
+	for (var page = 0; page < numPages; page++) {
+		$('<span class="page-number"></span>').text(page + 1).bind('click', {
+			newPage: page
+		}, function(event) {
+			currentPage = event.data['newPage'];
+			$(featuresElement).trigger('repaginate');
+			$(this).addClass('active').siblings().removeClass('active');
+		}).appendTo($pager).addClass('clickable');
+	}
+	$pager.insertBefore($(featuresElement).find("table").first()).find('span.page-number:first').addClass('active');
   });
 }
 
@@ -772,3 +832,4 @@ window.toggleFeature = function(featureId, tableName, zoom, force) {
 window.clearHighlights = function() {
   highlightLayer.clearLayers();
 }
+console.log(GeoPackageAPI);

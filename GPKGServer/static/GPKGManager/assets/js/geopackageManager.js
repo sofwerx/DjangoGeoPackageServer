@@ -110,3 +110,56 @@ Upload.prototype.progressHandling = function (event) {
     $(progress_bar_id + " .progress-bar").css("width", +percent + "%");
     $(progress_bar_id + " .status").text(percent + "%");
 };
+
+function sortParks(a, b) {
+  var _a = a.feature.properties.park;
+  var _b = b.feature.properties.park;
+  if (_a < _b) {
+    return -1;
+  }
+  if (_a > _b) {
+    return 1;
+  }
+  return 0;
+}
+
+L.Control.Search = L.Control.extend({
+  options: {
+    // topright, topleft, bottomleft, bottomright
+    position: 'topright',
+    placeholder: 'Search...'
+  },
+  initialize: function (options /*{ data: {...}  }*/) {
+    // constructor
+    L.Util.setOptions(this, options);
+  },
+  onAdd: function (map) {
+    // happens after added to map
+    var container = L.DomUtil.create('div', 'search-container');
+    this.form = L.DomUtil.create('form', 'form', container);
+    var group = L.DomUtil.create('div', 'form-group', this.form);
+    this.input = L.DomUtil.create('input', 'form-control input-sm', group);
+    this.input.type = 'text';
+    this.input.placeholder = this.options.placeholder;
+    this.results = L.DomUtil.create('div', 'list-group', group);
+    L.DomEvent.addListener(this.form, 'submit', this.submit, this);
+    L.DomEvent.disableClickPropagation(container);
+    return container;
+  },
+  onRemove: function (map) {
+    // when removed
+    L.DomEvent.removeListener(form, 'submit', this.submit, this);
+  },
+  itemSelected: function(e) {
+    L.DomEvent.preventDefault(e);
+	console.log(e);
+  },
+  submit: function(e) {
+    L.DomEvent.preventDefault(e);
+  }
+});
+
+L.control.search = function(id, options) {
+  return new L.Control.Search(id, options);
+}
+L.control.search(1,{ position: 'bottomleft' }).addTo(map);

@@ -39,6 +39,10 @@
     background: #555; 
 }
 
+footer{
+	z-index:6000;
+}
+
 .navigation-clean {
     padding-top: .52rem;
     padding-bottom: .52rem;
@@ -243,6 +247,26 @@
         margin: 0 auto;
         padding-bottom: 50px;
         width: 80%;
-        max-width: 978px;
-   ; 
+		max-width: 978px;
+}
 
+div.pager {
+    text-align: center;
+    margin: 1em 0;
+}
+
+div.pager span {
+    display: inline-block;
+    width: 1.8em;
+    height: 1.8em;
+    line-height: 1.8;
+    text-align: center;
+    cursor: pointer;
+    background: #000;
+    color: #fff;
+    margin-right: 0.5em;
+}
+
+div.pager span.active {
+    background: #c00;
+}
