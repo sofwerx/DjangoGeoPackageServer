@@ -8,7 +8,9 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/4.0.0/flatly/bootstrap.min.css">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Bitter:400,700">
-	<!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/leaflet.css">-->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/leaflet.css">
+	
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.css">
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"/>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/css/mdb.min.css">	
 	<link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css">	
@@ -51,7 +53,7 @@
 			<div>
 				<ul class="nav nav-tabs">
 					<li class="nav-item"><a id="PackagesTab" class="nav-link active" role="tab" data-toggle="tab" href="#tab-1">Packages</a></li>
-					<li class="nav-item"><a id="EdittingTab" class="nav-link" role="tab" data-toggle="tab" href="#tab-2">Editting</a></li>
+					<li class="nav-item"><a id="EditingTab" class="nav-link" role="tab" data-toggle="tab" href="#tab-2">Editing</a></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane active p-1" role="tabpanel" id="tab-1">
@@ -68,6 +70,10 @@
 						<ul class="list-group" id="listOfPackages">
 						  {% for gpkg in geopackages %}<li class="list-group-item waves-effec" onclick="loadSavedPackage({{gpkg.id}})">{{gpkg.name | title}}</li>{% endfor %}
 						</ul>
+						<hr>
+						<div class="col-12 text-center">
+							<button class="btn btn-outline-info col-11" onclick="saveGeoPackage()"><i class="fa fa-download" aria-hidden="true"></i> Download Geopackage</button>
+						</div>
 					</div>
 					<div class="tab-pane" role="tabpanel" id="tab-2">
 						<div id="parsingTaskCont" class="pt-1 text-center col-xs-12">
@@ -84,6 +90,10 @@
 						  <div class="tableGroup">
 							<div id="feature-tables"></div>
 						  </div>
+						</div>
+						<hr>
+						<div class="col-12 text-center">
+							<button class="btn btn-outline-info col-11" onclick="saveGeoPackage()"><i class="fa fa-download" aria-hidden="true"></i> Download Geopackage</button>
 						</div>
 					</div>
 				</div>
@@ -107,9 +117,12 @@
 	
 	<script src="https://unpkg.com/popper.js/dist/umd/popper.min.js"></script>
 	<script src="https://unpkg.com/popper.js/dist/umd/tooltip.min.js"></script>
+	
+	
 
 	<script src="/static/GPKGManager/assets/js/gp.js"></script>    
 	<script src="/static/GPKGManager/assets/js/common.js"></script>    
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.js"></script>
 	<script src="/static/GPKGManager/assets/js/geopackageManager.js"></script>
 	{%verbatim%}
   <script id="feature-table-template" type="x-tmpl-mustache">
@@ -122,7 +135,9 @@
 	</div>
 	<div id="feature-{{tableName}}" class="table-name" style="display: inline-block;">Feature Table: {{tableName}} (<span class="count">{{count}}</span>) <a  href="javascript:void(0);" class="btn btn-info text-center p-2 btn-rounded" data-toggle="tooltip" data-placement="top" title="Click to Zoom on Map" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{contents.srs.organization}}:{{contents.srs.organization_coordsys_id}}')"><i class="fa fa-search"></i></a><a style="padding-left: 7px" href="javascript:void(0);" onclick="downloadGeoJSON('{{tableName}}')">Download Layer as GeoJSON</a></div>
 	<br>
-	<a class="btn col-12 btn-info p-1" href="javascript:void(0);" onclick="$(this).next().toggle()">Edit Layer</a>
+	<a class="btn col-12 btn-info p-1 editLayerButton" href="javascript:void(0);" onclick="EditFeatureTable('{{tableName}}', $(this))">Edit This Layer</a>
+	<br>
+	<a class="btn col-12 btn-info p-1" href="javascript:void(0);" onclick="$(this).next().toggle()">View Extra Data</a>
 	<div class="table" style="display: none;">
 	  <div class="tab active" style="display: inline-block;" onclick="$(this).parent().find('.metadata').show(); $(this).parent().find('.features').hide();; $(this).parent().find('.tab').toggleClass('active');">Metadata</div>
 	  <div class="tab" style="display: inline-block;" onclick="$(this).parent().find('.features').show(); $(this).parent().find('.metadata').hide(); loadFeatures('{{tableName}}', $(this).parent().find('.features')); $(this).parent().find('.tab').toggleClass('active');">Features</div>
@@ -292,5 +307,6 @@ $(function () {
   $('[data-toggle="tooltip"]').tooltip()
 })
 	</script>
+	
 </body>
 </html>

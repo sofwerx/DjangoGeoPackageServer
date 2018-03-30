@@ -4,6 +4,7 @@ Change Templates to have their own generators, maybe make a templating object fo
 Change Logic of the feature and tile loads for faster response times
 Change implementation of templating generation for smoother UI experience (allowing timeouts for UI updates)
 */
+var tableDaos;
 (function (window, document, undefined) {
 
   L.Control.ZoomIndicator = L.Control.extend({
@@ -307,7 +308,7 @@ window.loadGeoPackage = function(files) {
 			return myXhr;
 		},
 	});
-	$("#EdittingTab")[0].click();
+	$("#EditingTab")[0].click();
 }
 
 //Clear Info
@@ -344,6 +345,7 @@ function loadByteArray(array, callback) {
   It also starts to render the templates for the tables */
 function readGeoPackage(callback) {
   tableInfos = {};
+  tableDaos = {};
   var featureTableTemplate = $('#feature-table-template').html();
   Mustache.parse(featureTableTemplate);
 
@@ -360,6 +362,7 @@ function readGeoPackage(callback) {
           geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
             geoPackage.getInfoForTable(tileDao, function(err, info) {
               tableInfos[table] = info;
+              tableDaos[table] = tileDao;
               var rendered = Mustache.render(tileTableTemplate, info);
               tileTableNode.append(rendered);
               callback();
@@ -376,6 +379,7 @@ function readGeoPackage(callback) {
             }
             geoPackage.getInfoForTable(featureDao, function(err, info) {
               tableInfos[table] = info;
+              tableDaos[table] = featureDao;
               var rendered = Mustache.render(featureTableTemplate, info);
               featureTableNode.append(rendered);
               callback();
@@ -470,7 +474,7 @@ window.toggleLayer = function(layerType, table) {
         done();
       });
     }, function(err) {
-		console.log(geojsonLayer);
+		//console.log(geojsonLayer);
       geojsonLayer.addTo(map);
       geojsonLayer.bringToFront();
       tableLayers[table] = geojsonLayer;

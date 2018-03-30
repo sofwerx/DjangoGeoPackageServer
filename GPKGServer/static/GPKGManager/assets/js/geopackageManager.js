@@ -1,3 +1,4 @@
+//This code is for setting up the request for CSRF protection
 $.ajaxSetup({ 
      beforeSend: function(xhr, settings) {
          function getCookie(name) {
@@ -22,6 +23,7 @@ $.ajaxSetup({
      } 
 });
 
+//Helper function to convert a string into a blob
 function stringToBytes(str)
 {
     let reader = new FileReader();
@@ -36,10 +38,12 @@ function stringToBytes(str)
     return { done: callback => { done = callback; } };
 }
 
+//This requests a file from the server by sending an ID and getting an base relative url from the server.
+//The function finds the current location, so this can be accessed on any domain.
 function loadSavedPackage(id){
 	console.log("You loaded geopackage #" + id);
 	
-	$("#EdittingTab")[0].click();
+	$("#EditingTab")[0].click();
 	$.ajax({
 		  type: "Get",
 		  url: "/retrieve/?id=" + id,
@@ -52,114 +56,97 @@ function loadSavedPackage(id){
 		  },
 		});
 }
-var Upload = function (file) {
-    this.file = file;
-};
 
-Upload.prototype.getType = function() {
-    return this.file.type;
-};
-Upload.prototype.getSize = function() {
-    return this.file.size;
-};
-Upload.prototype.getName = function() {
-    return this.file.name;
-};
-Upload.prototype.doUpload = function () {
-    var that = this;
-    var formData = new FormData();
+var editableLayers = new L.FeatureGroup();
+map.addLayer(editableLayers);
 
-    // add assoc key values, this will be posts values
-    formData.append("file", this.file, this.getName());
-    formData.append("upload_file", true);
+//This is a class containing the Leaflet Editor Controls
+//Feature Control Options correspond to the Leaflet.Draw class
+//Tile Control Options correspond to the Leaflet.MapPaint class
+class GPKGLeafletEditor {
+  constructor(FeatureControlOptions, TileControlOptions, map = map) {
+    this.FeatureControl = new L.Control.Draw(FeatureControlOptions);
+    //this.TileControl = new L.Control.Draw(FeatureControlOptions);
+	this.map = map;
+	var tObj = this;
+	this.map.on(L.Draw.Event.CREATED, function (e) {
+		var type = e.layerType,
+			layer = e.layer;
+		console.log(type);
+		if (type === 'marker') {
+			layer.bindPopup('A popup!');
+			GeoPackageAPI.addGeoJSONFeatureToGeoPackage(geoPackage, new L.geoJSON(e.layer.toGeoJSON()), tObj, function(){console.log("Hello");});
+		}
+		if (type === 'circlemarker') {
+			layer.bindPopup('A popup!');
+		}
 
-    $.ajax({
-        type: "POST",
-        url: "script",
-        xhr: function () {
-            var myXhr = $.ajaxSettings.xhr();
-            if (myXhr.upload) {
-                myXhr.upload.addEventListener('progress', that.progressHandling, false);
-            }
-            return myXhr;
-        },
-        success: function (data) {
-            // your callback here
-        },
-        error: function (error) {
-            // handle error
-        },
-        async: true,
-        data: formData,
-        cache: false,
-        contentType: false,
-        processData: false,
-        timeout: 60000
-    });
-};
+		//editableLayers.addLayer(layer);
+	});
+	this.tableName = "";
 
-Upload.prototype.progressHandling = function (event) {
-    var percent = 0;
-    var position = event.loaded || event.position;
-    var total = event.total;
-    var progress_bar_id = "#progress-wrp";
-    if (event.lengthComputable) {
-        percent = Math.ceil(position / total * 100);
-    }
-    // update progressbars classes so it fits your code
-    $(progress_bar_id + " .progress-bar").css("width", +percent + "%");
-    $(progress_bar_id + " .status").text(percent + "%");
-};
-
-function sortParks(a, b) {
-  var _a = a.feature.properties.park;
-  var _b = b.feature.properties.park;
-  if (_a < _b) {
-    return -1;
   }
-  if (_a > _b) {
-    return 1;
+  startFeatureEdit(tableName = "") {
+	if(this.map != null){
+		this.map.addControl(this.FeatureControl);
+		//this.map.removeControl(this.TileControl);
+		this.tableName = tableName;
+	}
   }
-  return 0;
+  startTileEdit() {
+	//Coming soon
+    //return this.height * this.width;
+  }
 }
 
-L.Control.Search = L.Control.extend({
-  options: {
-    // topright, topleft, bottomleft, bottomright
-    position: 'topright',
-    placeholder: 'Search...'
-  },
-  initialize: function (options /*{ data: {...}  }*/) {
-    // constructor
-    L.Util.setOptions(this, options);
-  },
-  onAdd: function (map) {
-    // happens after added to map
-    var container = L.DomUtil.create('div', 'search-container');
-    this.form = L.DomUtil.create('form', 'form', container);
-    var group = L.DomUtil.create('div', 'form-group', this.form);
-    this.input = L.DomUtil.create('input', 'form-control input-sm', group);
-    this.input.type = 'text';
-    this.input.placeholder = this.options.placeholder;
-    this.results = L.DomUtil.create('div', 'list-group', group);
-    L.DomEvent.addListener(this.form, 'submit', this.submit, this);
-    L.DomEvent.disableClickPropagation(container);
-    return container;
-  },
-  onRemove: function (map) {
-    // when removed
-    L.DomEvent.removeListener(form, 'submit', this.submit, this);
-  },
-  itemSelected: function(e) {
-    L.DomEvent.preventDefault(e);
-	console.log(e);
-  },
-  submit: function(e) {
-    L.DomEvent.preventDefault(e);
-  }
+
+var MyCustomMarker = L.Icon.extend({
+	options: {
+		shadowUrl: null,
+		iconAnchor: new L.Point(12, 24),
+		popupAnchor: new L.Point(0, -24),
+		iconSize: new L.Point(24, 24),
+		iconUrl: 'https://png.icons8.com/metro/1600/marker.png'
+	}
 });
 
-L.control.search = function(id, options) {
-  return new L.Control.Search(id, options);
+var FeatureOptions = {
+	position: 'topright',
+	draw: {
+		polyline: {
+			shapeOptions: {
+				color: '#f357a1',
+				weight: 10
+			}
+		},
+		polygon: {
+			allowIntersection: false, // Restricts shapes to simple polygons
+			drawError: {
+				color: '#e1e100', // Color the shape will turn when intersects
+				message: '<strong>Oh snap!<strong> you can\'t draw that!' // Message that will show when intersect
+			},
+			shapeOptions: {
+				color: '#bada55'
+			}
+		},
+		circle: false, // Turns off this drawing tool
+		circlemarker: false, 
+		rectangle: false,
+		marker: {}
+	}
+};
+
+/*var drawControl = new L.Control.Draw(options);
+map.addControl(drawControl);*/
+gpkgDrawControl = new GPKGLeafletEditor(FeatureOptions,null,map);
+
+function EditFeatureTable(table, btnObj){
+	if(!tableLayers[table]){
+		toggleLayer('feature', table);
+		$("#myonoffswitch-" + table)[0].checked = true;
+	}
+	
+	gpkgDrawControl.startFeatureEdit(table);
+	$(".editLayerButton").removeClass("active");
+	$(btnObj).addClass("active");
 }
-L.control.search(1,{ position: 'bottomleft' }).addTo(map);
