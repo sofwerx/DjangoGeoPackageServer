@@ -8,6 +8,6 @@ class GeoPackageViewSet(viewsets.ModelViewSet):
 
     queryset = models.GeoPackage.objects.all()
     serializer_class = serializers.GeoPackageSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = []
 
 

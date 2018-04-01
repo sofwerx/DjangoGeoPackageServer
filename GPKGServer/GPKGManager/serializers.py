@@ -13,7 +13,7 @@ class GeoPackageSerializer(serializers.ModelSerializer):
             'created', 
             'last_updated', 
             'Token', 
-			'Data'
+			'File'
         )
 
 
