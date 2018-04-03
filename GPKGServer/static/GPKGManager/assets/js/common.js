@@ -53,6 +53,7 @@ var imageOverlay;
 var currentTile = {};
 var tableInfos;
 var fileName;
+var allTableNames = [];
 
 // Save GPKG Function
 /* The next two functions are Downloading the geopackage by exporting and transforming the data in the geopackage into a Blob*/
@@ -346,6 +347,7 @@ function loadByteArray(array, callback) {
 function readGeoPackage(callback) {
   tableInfos = {};
   tableDaos = {};
+  allTableNames = [];
   var featureTableTemplate = $('#feature-table-template').html();
   Mustache.parse(featureTableTemplate);
 
@@ -387,10 +389,18 @@ function readGeoPackage(callback) {
           });
         }, callback);
       });
+    }, function(callback) {
+      geoPackage.getContentsDao().queryForAll(function(err, tableNames) {
+        console.log(tableNames);
+      });
+    }, function(callback) {
+      geoPackage.getExtensionDao().queryForAll(function(err, tableNames) {
+        console.log(tableNames);
+      });
     }
   ], callback);
 }
-
+//queryForAll
 /*This function zooms to the bounding box of an object*/
 window.zoomTo = function(minX, minY, maxX, maxY, projection) {
   try {

@@ -150,3 +150,12 @@ function EditFeatureTable(table, btnObj){
 	$(".editLayerButton").removeClass("active");
 	$(btnObj).addClass("active");
 }
+
+//THis shows the modal of the info
+function showInfoModal(elementToCopy){
+	$clone = elementToCopy.clone( true );
+	$("#showInfoModal").find(".modal-body").empty();
+	console.log($clone);
+	$("#showInfoModal").find(".modal-body").append($clone.removeAttr('style'));
+	jQuery("#showInfoModal").modal("show");
+}

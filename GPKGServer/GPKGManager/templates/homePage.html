@@ -109,6 +109,25 @@
 			</ul>
 		</footer>
 	</div>
+<div class="modal fade" id="showInfoModal" tabindex="-1" role="dialog" aria-labelledby="showInfoModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="showInfoModalLabel">Extra Information</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-inverse" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+       
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.bundle.min.js"></script>
@@ -135,9 +154,9 @@
 	</div>
 	<div id="feature-{{tableName}}" class="table-name" style="display: inline-block;">Feature Table: {{tableName}} (<span class="count">{{count}}</span>) <a  href="javascript:void(0);" class="btn btn-info text-center p-2 btn-rounded" data-toggle="tooltip" data-placement="top" title="Click to Zoom on Map" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{contents.srs.organization}}:{{contents.srs.organization_coordsys_id}}')"><i class="fa fa-search"></i></a><a style="padding-left: 7px" href="javascript:void(0);" onclick="downloadGeoJSON('{{tableName}}')">Download Layer as GeoJSON</a></div>
 	<br>
-	<a class="btn col-12 btn-info p-1 editLayerButton" href="javascript:void(0);" onclick="EditFeatureTable('{{tableName}}', $(this))">Edit This Layer</a>
-	<br>
-	<a class="btn col-12 btn-info p-1" href="javascript:void(0);" onclick="$(this).next().toggle()">View Extra Data</a>
+	<a class="btn col-5 btn-info p-2 editLayerButton" href="javascript:void(0);" onclick="EditFeatureTable('{{tableName}}', $(this))">Edit This Layer</a>
+	<span class="col-2 m-0"></span>
+	<a class="btn col-5 btn-info p-2" href="javascript:void(0);" onclick="showInfoModal($(this).next())">View Extra Data</a>
 	<div class="table" style="display: none;">
 	  <div class="tab active" style="display: inline-block;" onclick="$(this).parent().find('.metadata').show(); $(this).parent().find('.features').hide();; $(this).parent().find('.tab').toggleClass('active');">Metadata</div>
 	  <div class="tab" style="display: inline-block;" onclick="$(this).parent().find('.features').show(); $(this).parent().find('.metadata').hide(); loadFeatures('{{tableName}}', $(this).parent().find('.features')); $(this).parent().find('.tab').toggleClass('active');">Features</div>
