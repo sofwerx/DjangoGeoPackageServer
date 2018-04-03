@@ -42,7 +42,8 @@
 	<div class="row" style="height:calc(100vh - 130px);width:100vw;margin:0;/*padding:0;*/">
 		
 		<div id="loader-wrapper">
-			<div id="loader"></div>
+			<div id="loader">
+			</div>
 
 			<div class="loader-section section-left"></div>
             <div class="loader-section section-right"></div>
@@ -62,7 +63,7 @@
 						  <label id="choose-label" class="" for="file"><span>Upload a Geopackage </span><i style="display: none;" class="fa fa-spinner fa-pulse"></i></label>
 						<div id="myProgress">
 							<p>Uploading GeoPackage</p>
-						  <div id="myBar"></div>
+							<div id="myBar"></div>
 						</div>
 						</div>
 						<hr>
@@ -118,9 +119,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
-                ...
-            </div>
+            <div class="modal-body"></div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-inverse" data-dismiss="modal">Close</button>
             </div>
@@ -143,9 +142,9 @@
 	<script src="/static/GPKGManager/assets/js/common.js"></script>    
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.js"></script>
 	<script src="/static/GPKGManager/assets/js/geopackageManager.js"></script>
-	{%verbatim%}
-  <script id="feature-table-template" type="x-tmpl-mustache">
-  <div>
+	{% verbatim %}
+	<script id="feature-table-template" type="x-tmpl-mustache">
+	<div>
 	<div class="" style="display: inline-block;">
 	  <input type="checkbox" name="onoffswitch-{{tableName}}" class="onoffswitch-checkbox" id="myonoffswitch-{{tableName}}" onchange="toggleLayer('feature', '{{tableName}}')">
 	  <label class="onoffswitch-label" for="myonoffswitch-{{tableName}}">
@@ -167,7 +166,7 @@
 			<p>{{contents.description}}</p>
 		  </div>
 		</div>
-		
+
 		<div class="geometryColumns">
 		  <div class="section-title"><h4>Geometry Columns</h4></div>
 		  <div class="section">
@@ -187,13 +186,13 @@
 			  </thead>
 			  <tbody>
 				{{#columns}}
-			  	<tr>
+				<tr>
 					<th>{{index}}</th>
 					<th>{{name}}</th>
 					<th>{{dataType}}</th>
 					<th>{{notNull}}</th>
 				</tr>
-				
+
 				  {{#dataColumn}}
 				  <tr>
 					  <th>Data Name: {{dataColumn.name}}</th>
@@ -211,9 +210,9 @@
 	  </div>
 	</div>
 	<hr>
-  </div>
-  </script>
-  <script id="all-features-template" type="x-tmpl-mustache">
+	</div>
+</script>
+	<script id="all-features-template" type="x-tmpl-mustache">
 	<table class="table" onmouseout="clearHighlights()">
 	  <thead>
 		<tr>
@@ -232,9 +231,9 @@
 	  </tr>
 	  {{/features}}
 	</table>
-  </script>
-  <script id="tile-table-template" type="x-tmpl-mustache">
-  <div>
+</script>
+	<script id="tile-table-template" type="x-tmpl-mustache">
+	<div>
 	<div class="onoffswitch" style="display: inline-block;">
 	  <input type="checkbox" name="onoffswitch-{{tableName}}" class="onoffswitch-checkbox" id="myonoffswitch-{{tableName}}" onchange="toggleLayer('tile', '{{tableName}}')">
 	  <label class="onoffswitch-label" for="myonoffswitch-{{tableName}}">
@@ -257,7 +256,7 @@
 			<div class="item"><span class="label">Max Zoom: </span><span class="value">{{maxZoom}}</span></div>
 		  </div>
 		</div>
-		
+
 		<div class="contents">
 		  <div class="section-title"><h4>Description</h4></div>
 		  <div class="section">
@@ -276,7 +275,7 @@
 			  </thead>
 			  <tbody>
 				{{#columns}}
-			  	<tr>
+				<tr>
 					<th>{{index}}</th>
 					<th>{{name}}</th>
 					<th>{{notNull}}</th>
@@ -291,17 +290,17 @@
 	  </div>
 	</div>
 	<hr>
-  </div>
-  </script>
-  <script id="tile-zoom-levels-template" type="x-tmpl-mustache">
-  <span style="font-size: 12px;" class="label">Zoom:</span>
-  {{#zooms}}
-  <input type="radio" name="zoomLevel" value="{{zoom}}" onchange="loadTiles('{{tableName}}', {{zoom}}, $(this).parent().find('.tiles'))"><span class="value" style="font-size: 12px;">{{zoom}}</span>
-  {{/zooms}}
-  <div class="tiles">
-  </div>
-  </script>
-  <script id="all-tiles-template" type="x-tmpl-mustache">
+	</div>
+</script>
+	<script id="tile-zoom-levels-template" type="x-tmpl-mustache">
+	<span style="font-size: 12px;" class="label">Zoom:</span>
+	{{#zooms}}
+	<input type="radio" name="zoomLevel" value="{{zoom}}" onchange="loadTiles('{{tableName}}', {{zoom}}, $(this).parent().find('.tiles'))"><span class="value" style="font-size: 12px;">{{zoom}}</span>
+	{{/zooms}}
+	<div class="tiles">
+	</div>
+	</script>
+	<script id="all-tiles-template" type="x-tmpl-mustache">
 	<table class="table table-responsive-md" onmouseout="clearHighlights()">
 	  <thead class="mdb-color lighten-4">
 		<tr>
@@ -320,11 +319,12 @@
 	  </tr>
 	  {{/tiles}}
 	</table>
-  </script>{% endverbatim %}
+  </script>
+	{% endverbatim %}
 	<script>
-$(function () {
-  $('[data-toggle="tooltip"]').tooltip()
-})
+		$(function () {
+		  $('[data-toggle="tooltip"]').tooltip()
+		})
 	</script>
 	
 </body>

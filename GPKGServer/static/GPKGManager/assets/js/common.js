@@ -347,7 +347,7 @@ function loadByteArray(array, callback) {
 function readGeoPackage(callback) {
   tableInfos = {};
   tableDaos = {};
-  allTableNames = [];
+  allTableRelations = {};
   var featureTableTemplate = $('#feature-table-template').html();
   Mustache.parse(featureTableTemplate);
 
@@ -393,10 +393,41 @@ function readGeoPackage(callback) {
       geoPackage.getContentsDao().queryForAll(function(err, tableNames) {
         console.log(tableNames);
       });
-    }, function(callback) {
-      geoPackage.getExtensionDao().queryForAll(function(err, tableNames) {
-        console.log(tableNames);
-      });
+		// We're getting all of the table names from this package
+		//Now we suss out data from the relations table
+		geoPackage.connection.all("select * from gpkgext_relations", function (err, data) {
+			console.log(data);
+			data.forEach(function(tableRelationObj){
+				console.log(tableRelationObj);
+				if(! (tableRelationObj.base_tbl in allTableRelations)){
+					allTableRelations[tableRelationObj.base_tbl] = {};
+				}
+				if(! (tableRelationObj.related_tbl in allTableRelations)){
+					allTableRelations[tableRelationObj.related_tbl] = {};
+				}
+				allTableRelations[tableRelationObj.base_tbl] = {"FirstKey": tableRelationObj.base_key,"SecondKey":tableRelationObj.related_key};
+				geoPackage.connection.all("select * from "+tableRelationObj.mapping_tbl, function (err, relations) {
+					console.log(relations);
+					for(let index in relations){
+						if(allTableRelations[tableRelationObj.base_tbl][relations[index].base_id] == undefined){
+							allTableRelations[tableRelationObj.base_tbl][relations[index].base_id] = {};
+						}
+						if(allTableRelations[tableRelationObj.related_tbl][relations[index].related_id] == undefined){
+							allTableRelations[tableRelationObj.related_tbl][relations[index].related_id] = {};
+						}
+						if(allTableRelations[tableRelationObj.base_tbl][relations[index].base_id][tableRelationObj.related_tbl] == undefined){
+							allTableRelations[tableRelationObj.base_tbl][relations[index].base_id][tableRelationObj.related_tbl] = {};
+						}
+						if(allTableRelations[tableRelationObj.related_tbl][relations[index].related_id][tableRelationObj.base_tbl] == undefined){
+							allTableRelations[tableRelationObj.related_tbl][relations[index].related_id][tableRelationObj.base_tbl] = {};
+						}
+						allTableRelations[tableRelationObj.base_tbl][relations[index].base_id][tableRelationObj.related_tbl][relations[index].related_id] = {"type":tableRelationObj.relation_name};
+						allTableRelations[tableRelationObj.related_tbl][relations[index].related_id][tableRelationObj.base_tbl][relations[index].base_id] = {"type":tableRelationObj.relation_name};
+					}
+				});
+				//allTableNames[tableName.name] = {};
+			})
+		});
     }
   ], callback);
 }

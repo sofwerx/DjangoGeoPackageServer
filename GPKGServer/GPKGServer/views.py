@@ -12,7 +12,7 @@ from GPKGManager.models import GeoPackage
 @csrf_protect
 def home(request):
 	c = {'geopackages':GeoPackage.objects.all()}
-	return render(request, 'homePageWorking.html', c)
+	return render(request, 'homePage.html', c)
 
 
 def retrieveGPKG(request):
@@ -33,4 +33,4 @@ def createGeoPackage(request):
 @csrf_protect
 def prototype(request):
 	c = {'geopackages':GeoPackage.objects.all()}
-	return render(request, 'homePage.html', c)
+	return render(request, 'homePageWorking.html', c)

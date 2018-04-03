@@ -155,7 +155,6 @@ function EditFeatureTable(table, btnObj){
 function showInfoModal(elementToCopy){
 	$clone = elementToCopy.clone( true );
 	$("#showInfoModal").find(".modal-body").empty();
-	console.log($clone);
 	$("#showInfoModal").find(".modal-body").append($clone.removeAttr('style'));
 	jQuery("#showInfoModal").modal("show");
 }
