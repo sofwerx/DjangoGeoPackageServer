@@ -343,6 +343,7 @@ function loadByteArray(array, callback) {
 
 //Read GeoPackage
 /*This function iterates through the Feature and Tile daos and retrieves their information
+  It now also establishes a data structure for related tables
   It also starts to render the templates for the tables */
 function readGeoPackage(callback) {
   tableInfos = {};
@@ -431,7 +432,7 @@ function readGeoPackage(callback) {
     }
   ], callback);
 }
-//queryForAll
+
 /*This function zooms to the bounding box of an object*/
 window.zoomTo = function(minX, minY, maxX, maxY, projection) {
   try {
@@ -441,6 +442,52 @@ window.zoomTo = function(minX, minY, maxX, maxY, projection) {
   } catch (e) {
     map.fitBounds([[minY, minX], [maxY, maxX]]);
   }
+}
+
+function getRelationContent(data){
+	retListArray = [];
+	for(let index in data){
+		if(data[index].content_type.startsWith("image")){
+			//Need to make a better data management structure, potential memory leak here if browser doesn't handle unused memory correctly
+			let blobURI = URL.createObjectURL(new Blob( [ data[index].data ], { type: data[index].content_type } ));
+			//console.log(blobURI);
+			$newListItem = $("<li>",{class:"list-group-item text-center"});
+			$newImage = $("<img />",{src:blobURI, width:"100%","max-height":"300px"});
+			$newListItem.append($newImage);
+			retListArray.push($newListItem);
+		}
+	}
+	return retListArray;
+}
+
+//This gets and generates a list of data from the gpkg;
+//Will need to seperate the logic and functionality soon;
+function popupRelationsModal(tableName,id){
+	$relContainer = $("<div/>");;
+	$("#showRelationsModal").find(".modal-body").empty();
+	console.log(allTableRelations[tableName][id]);
+	let relationArray = Object.keys(allTableRelations[tableName][id]);
+	for(let key in relationArray){
+		$newRelationContainer = $("<div>",{class:"newRelation",id:"relation-"+tableName});
+		$newRelationHeader = $("<h4>",{class:"relationHeader",text:"\""+relationArray[key]+"\""});
+		$newRelationList = $("<ul>",{class:"list-group"});
+		let relationIDString = Object.keys(allTableRelations[tableName][id][relationArray[key]]).join();
+		geoPackage.connection.all("select * from "+relationArray[key]+" where id in ("+relationIDString+")", function (err, data) {
+			$newRelationList.append(getRelationContent(data));
+		});
+		$newRelationHR = $("<hr />");
+		$newRelationContainer.append($newRelationContainer,$newRelationHeader,$newRelationList,$newRelationHR);
+		$relContainer.append($newRelationContainer);
+	}
+	$("#showRelationsModal").find(".modal-body").append($relContainer);
+	jQuery("#showRelationsModal").modal("show");
+}
+
+function generatePopupContent(feature,table){
+	$container = $("<div/>",{});
+	$button = $("<button />",{class:"btn btn-default",text:"View Related Data",onclick:"popupRelationsModal('"+table+"',"+feature["id"]+")"});
+	$container.append($button);
+	return $container.html();
 }
 
 //Toggle Layer
@@ -495,10 +542,13 @@ window.toggleLayer = function(layerType, table) {
         pointToLayer: pointToLayer,
         onEachFeature: function (feature, layer) {
           var string = "";
+		  let content = undefined;
+		  //console.log(feature);
           for (var key in feature.properties) {
-            string += '<div class="item"><span class="label">' + key + ': </span><span class="value">' + feature.properties[key] + '</span></div>';
+            //string += '<div class="item"><span class="label">' + key + ': </span><span class="value">' + feature.properties[key] + '</span></div>';
+			content = generatePopupContent(feature,table);
           }
-          layer.bindPopup(string);
+          layer.bindPopup(content);
         },
         coordsToLatLng: function(coords) {
           // if (coords[0] < 0) {
