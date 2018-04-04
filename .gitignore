@@ -2,3 +2,4 @@ env
 **/*.sqlite3
 **/*.pyc
 media
+node_modules
