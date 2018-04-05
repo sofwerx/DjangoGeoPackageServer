@@ -400,30 +400,30 @@ function readGeoPackage(callback) {
 			console.log(data);
 			data.forEach(function(tableRelationObj){
 				console.log(tableRelationObj);
-				if(! (tableRelationObj.base_tbl in allTableRelations)){
-					allTableRelations[tableRelationObj.base_tbl] = {};
+				if(! (tableRelationObj.base_table_name in allTableRelations)){
+					allTableRelations[tableRelationObj.base_table_name] = {};
 				}
-				if(! (tableRelationObj.related_tbl in allTableRelations)){
-					allTableRelations[tableRelationObj.related_tbl] = {};
+				if(! (tableRelationObj.related_table_name in allTableRelations)){
+					allTableRelations[tableRelationObj.related_table_name] = {};
 				}
-				allTableRelations[tableRelationObj.base_tbl] = {"FirstKey": tableRelationObj.base_key,"SecondKey":tableRelationObj.related_key};
-				geoPackage.connection.all("select * from "+tableRelationObj.mapping_tbl, function (err, relations) {
+				allTableRelations[tableRelationObj.base_table_name] = {"FirstKey": tableRelationObj.base_primary_colum,"SecondKey":tableRelationObj.related_primary_colum};
+				geoPackage.connection.all("select * from "+tableRelationObj.mapping_table_name, function (err, relations) {
 					console.log(relations);
 					for(let index in relations){
-						if(allTableRelations[tableRelationObj.base_tbl][relations[index].base_id] == undefined){
-							allTableRelations[tableRelationObj.base_tbl][relations[index].base_id] = {};
+						if(allTableRelations[tableRelationObj.base_table_name][relations[index].base_id] == undefined){
+							allTableRelations[tableRelationObj.base_table_name][relations[index].base_id] = {};
 						}
-						if(allTableRelations[tableRelationObj.related_tbl][relations[index].related_id] == undefined){
-							allTableRelations[tableRelationObj.related_tbl][relations[index].related_id] = {};
+						if(allTableRelations[tableRelationObj.related_table_name][relations[index].related_id] == undefined){
+							allTableRelations[tableRelationObj.related_table_name][relations[index].related_id] = {};
 						}
-						if(allTableRelations[tableRelationObj.base_tbl][relations[index].base_id][tableRelationObj.related_tbl] == undefined){
-							allTableRelations[tableRelationObj.base_tbl][relations[index].base_id][tableRelationObj.related_tbl] = {};
+						if(allTableRelations[tableRelationObj.base_table_name][relations[index].base_id][tableRelationObj.related_table_name] == undefined){
+							allTableRelations[tableRelationObj.base_table_name][relations[index].base_id][tableRelationObj.related_table_name] = {};
 						}
-						if(allTableRelations[tableRelationObj.related_tbl][relations[index].related_id][tableRelationObj.base_tbl] == undefined){
-							allTableRelations[tableRelationObj.related_tbl][relations[index].related_id][tableRelationObj.base_tbl] = {};
+						if(allTableRelations[tableRelationObj.related_table_name][relations[index].related_id][tableRelationObj.base_table_name] == undefined){
+							allTableRelations[tableRelationObj.related_table_name][relations[index].related_id][tableRelationObj.base_table_name] = {};
 						}
-						allTableRelations[tableRelationObj.base_tbl][relations[index].base_id][tableRelationObj.related_tbl][relations[index].related_id] = {"type":tableRelationObj.relation_name};
-						allTableRelations[tableRelationObj.related_tbl][relations[index].related_id][tableRelationObj.base_tbl][relations[index].base_id] = {"type":tableRelationObj.relation_name};
+						allTableRelations[tableRelationObj.base_table_name][relations[index].base_id][tableRelationObj.related_table_name][relations[index].related_id] = {"type":tableRelationObj.relation_name};
+						allTableRelations[tableRelationObj.related_table_name][relations[index].related_id][tableRelationObj.base_table_name][relations[index].base_id] = {"type":tableRelationObj.relation_name};
 					}
 				});
 				//allTableNames[tableName.name] = {};
@@ -453,6 +453,7 @@ function getRelationContent(data,relTableName){
 	let graphData = {};
 	//="highlightFeature({{id}}, '{{tableName}}')"
 	for(let index in data){
+		console.log(data[index]);
 		if(data[index].content_type!=undefined && data[index].content_type.startsWith("image")){
 			//Need to make a better data management structure, potential memory leak here if browser doesn't handle unused memory correctly
 			let blobURI = URL.createObjectURL(new Blob( [ data[index].data ], { type: data[index].content_type } ));
@@ -478,7 +479,7 @@ function getRelationContent(data,relTableName){
 			}
 		}
 		else{ //F2F assumed default, going to be a problem if there's no differentiator for customs
-			console.log("Hello");
+			//console.log("Hello");
 			$newListItem = $("<li>",{class:"list-group-item text-center",text:"Feature #" + index,onmouseover:"highlightFeature("+data[index]["id"]+",'"+relTableName+"')"});
 			retListArray.push($newListItem);
 		}
