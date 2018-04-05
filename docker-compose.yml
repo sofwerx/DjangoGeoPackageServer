@@ -1,0 +1,10 @@
+version: '2.0'
+
+services:
+
+  django-geopackage-server:
+    build: .
+    image: django-geopackage-server
+    ports:
+      - 7999:7999
+

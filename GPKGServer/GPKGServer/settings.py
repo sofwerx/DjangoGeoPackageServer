@@ -26,8 +26,8 @@ DEBUG = True
 #DEBUG = False
 
 ALLOWED_HOSTS = [
-	'127.0.0.1',
-	'127.0.0.1.',
+        os.environ.get('DJANGO_HOSTNAME', '127.0.0.1'),
+        os.environ.get('DJANGO_HOSTNAME', '127.0.0.1') + '.',
 	'192.168.13.244',
 	'192.168.13.244.',
 	#'127.0.0.1.', #Other Hosts
@@ -84,10 +84,12 @@ WSGI_APPLICATION = 'GPKGServer.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
+SQLITE_DB_PATH = os.environ.get('SQLITE_DB_PATH', os.path.join(BASE_DIR, 'db.sqlite3'))
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': SQLITE_DB_PATH
     }
 }
 
