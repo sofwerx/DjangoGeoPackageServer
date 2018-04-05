@@ -26,8 +26,8 @@ DEBUG = True
 #DEBUG = False
 
 ALLOWED_HOSTS = [
-	'127.0.0.1',
-	'127.0.0.1.',
+        os.environ.get('DJANGO_HOSTNAME', '127.0.0.1'),
+        os.environ.get('DJANGO_HOSTNAME', '127.0.0.1') + '.',
 	'192.168.13.244',
 	'192.168.13.244.',
 	#'127.0.0.1.', #Other Hosts
