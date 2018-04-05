@@ -444,16 +444,42 @@ window.zoomTo = function(minX, minY, maxX, maxY, projection) {
   }
 }
 
-function getRelationContent(data){
-	retListArray = [];
+function getRelationContent(data,relTableName){
+	let retListArray = [];
+	console.log(data);
+	
+	let graphlabel=[];
+	let graphTData=[];
+	let graphData = {};
+	//="highlightFeature({{id}}, '{{tableName}}')"
 	for(let index in data){
-		if(data[index].content_type.startsWith("image")){
+		if(data[index].content_type!=undefined && data[index].content_type.startsWith("image")){
 			//Need to make a better data management structure, potential memory leak here if browser doesn't handle unused memory correctly
 			let blobURI = URL.createObjectURL(new Blob( [ data[index].data ], { type: data[index].content_type } ));
 			//console.log(blobURI);
 			$newListItem = $("<li>",{class:"list-group-item text-center"});
 			$newImage = $("<img />",{src:blobURI, width:"100%","max-height":"300px"});
 			$newListItem.append($newImage);
+			retListArray.push($newListItem);
+		}
+		else if(data[index].type!=undefined && data[index].type.startsWith("graph")){
+			//for now let's assume its the timestamp graph
+			//console.log("Hello");
+			peopleCount = JSON.parse(data[index].propertyDict).people || 0;
+			graphlabel.push(new Date(data[index]["timestamp"]).toString().split(" ")[4]);
+			graphTData.push(peopleCount);
+			if(index == data.length-1){
+				graphData["Title"] = "People Seen"
+				graphData["Type"] = "Line";
+				graphData["Label"] = graphlabel;
+				graphData["Data"] = graphTData;
+				retListArray.push(generateChart(graphData));
+				
+			}
+		}
+		else{ //F2F assumed default, going to be a problem if there's no differentiator for customs
+			console.log("Hello");
+			$newListItem = $("<li>",{class:"list-group-item text-center",text:"Feature #" + index,onmouseover:"highlightFeature("+data[index]["id"]+",'"+relTableName+"')"});
 			retListArray.push($newListItem);
 		}
 	}
@@ -463,19 +489,19 @@ function getRelationContent(data){
 //This gets and generates a list of data from the gpkg;
 //Will need to seperate the logic and functionality soon;
 function popupRelationsModal(tableName,id){
-	$relContainer = $("<div/>");;
+	$relContainer = $("<div/>",{class:"overflowVert"});
 	$("#showRelationsModal").find(".modal-body").empty();
 	console.log(allTableRelations[tableName][id]);
 	let relationArray = Object.keys(allTableRelations[tableName][id]);
 	for(let key in relationArray){
-		$newRelationContainer = $("<div>",{class:"newRelation",id:"relation-"+tableName});
-		$newRelationHeader = $("<h4>",{class:"relationHeader",text:"\""+relationArray[key]+"\""});
-		$newRelationList = $("<ul>",{class:"list-group"});
+		let $newRelationContainer = $("<div>",{class:"newRelation",id:"relation-"+tableName});
+		let $newRelationHeader = $("<h4>",{class:"relationHeader",text:"\""+relationArray[key]+"\""});
+		let $newRelationList = $("<ul>",{class:"list-group"});
 		let relationIDString = Object.keys(allTableRelations[tableName][id][relationArray[key]]).join();
 		geoPackage.connection.all("select * from "+relationArray[key]+" where id in ("+relationIDString+")", function (err, data) {
-			$newRelationList.append(getRelationContent(data));
+			$newRelationList.append(getRelationContent(data,relationArray[key]));
 		});
-		$newRelationHR = $("<hr />");
+		let $newRelationHR = $("<hr />");
 		$newRelationContainer.append($newRelationContainer,$newRelationHeader,$newRelationList,$newRelationHR);
 		$relContainer.append($newRelationContainer);
 	}
@@ -868,7 +894,6 @@ var highlightLayer = L.geoJson([], {
 map.addLayer(highlightLayer);
 
 window.highlightFeature = function(featureId, tableName) {
-
   GeoPackageAPI.getFeature(geoPackage, tableName, featureId, function(err, geoJson) {
     highlightLayer.clearLayers();
     highlightLayer.addData(geoJson);

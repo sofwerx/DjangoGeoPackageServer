@@ -273,3 +273,11 @@ div.pager span.active {
 #parsingTaskCont{
 	display:none;
 }
+.overflowVert{
+	overflow-y:scroll;
+	height: 80vh;
+}
+.modal .modal-full-height{
+	width:600px;
+}
+.modal-backdrop {display:none}

@@ -22,6 +22,8 @@
 	function ga() {};
 	ga('send', 'pageview');
 	</script>
+	<style>
+	</style>
 </head>
 
 <body>
@@ -42,9 +44,10 @@
 	<div class="row" style="height:calc(100vh - 130px);width:100vw;margin:0;/*padding:0;*/">
 		
 		<div id="loader-wrapper">
+			
 			<div id="loader">
 			</div>
-
+			
 			<div class="loader-section section-left"></div>
             <div class="loader-section section-right"></div>
 
@@ -69,7 +72,7 @@
 						<hr>
 						<h3 class="col-xs-12 text-center">List of Saved Geopackages</h3>
 						<ul class="list-group" id="listOfPackages">
-						  {% for gpkg in geopackages %}<li class="list-group-item waves-effec" onclick="loadSavedPackage({{gpkg.id}})">{{gpkg.name | title}}</li>{% endfor %}
+						  {% for gpkg in geopackages %}<a href="#" class="list-group-item waves-effect" onclick="loadSavedPackage({{gpkg.id}})">{{gpkg.name | title}}</a>{% endfor %}
 						</ul>
 						<hr>
 						<div class="col-12 text-center">
@@ -146,6 +149,9 @@
        
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/js/materialize.min.js"></script>
+	<script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.bundle.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/js/mdb.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.2/pagination.min.js"></script>

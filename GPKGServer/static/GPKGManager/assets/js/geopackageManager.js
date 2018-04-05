@@ -158,3 +158,82 @@ function showInfoModal(elementToCopy){
 	$("#showInfoModal").find(".modal-body").append($clone.removeAttr('style'));
 	jQuery("#showInfoModal").modal("show");
 }
+function newBarChart(ctx,data){
+	var myChart = new Chart(ctx, {
+		type: 'bar',
+		data: {
+			labels: (data["Label"]?data["Label"]:["Red", "Blue", "Yellow", "Green", "Purple", "Orange"]),
+			datasets: [{
+				label: (data["Title"]?data["Title"]:'# of Votes'),
+				data: (data["Data"]?data["Data"]:[12, 19, 3, 5, 2, 3]),
+				backgroundColor: 'rgba(92, 132, 255, 0.2)',
+				borderColor: 'rgba(92,132,255,1)',
+				borderWidth: 1
+			}]
+		},
+		options: {
+			scales: {
+				yAxes: [{
+					ticks: {
+						beginAtZero:true
+					}
+				}]
+			}
+		}
+	});
+}
+function newLineChart(ctx,data){
+	var myLineChart = new Chart(ctx, {
+		type: 'line',
+		data: {
+			labels: (data["Label"]?data["Label"]:["January", "February", "March", "April", "May", "June", "July"]),
+			datasets: [
+				{
+					label: (data["Title"]?data["Title"]:"Sample Data"),
+					fillColor: "rgba(220,220,220,0.2)",
+					strokeColor: "rgba(220,220,220,1)",
+					pointColor: "rgba(220,220,220,1)",
+					pointStrokeColor: "#fff",
+					pointHighlightFill: "#fff",
+					pointHighlightStroke: "rgba(220,220,220,1)",
+					data: (data["Data"]?data["Data"]:[65, 59, 80, 81, 56, 55, 40])
+				}
+			]
+		},
+		options: {
+			responsive: true
+		}    
+	});
+}
+
+function generateChart(data){
+	$newGridCont = $("<div>",{class:"mt-1 col-md-12"});
+	$newCard = $("<div>",{class:"card card-body"});
+	$newCardTitle = $("<div>",{class:"card-title"});
+	$newCardTitleText = $("<span>").text(data["Title"]);
+	$newCardFilterButton = $("<button>",{class:"btn btn-sm btn-primary dropdown-toggle float-right","data-toggle":"dropdown","aria-haspopup":"true","aria-expandanded":"false"}).text("Filter");
+	$dropDownMenu = $("<div>",{class:"dropdown-menu"});
+	$dailyLink = $("<div>",{class:"dropdown-item",href:"#"}).text("Daily");
+	$monthlyLink = $("<div>",{class:"dropdown-item",href:"#"}).text("Monthly");
+	$yearlyLink = $("<div>",{class:"dropdown-item",href:"#"}).text("Yearly");
+	$canvas = $("<canvas>");
+	$dropDownMenu.append($dailyLink);
+	$dropDownMenu.append($monthlyLink);
+	$dropDownMenu.append($yearlyLink);
+	$newCardTitle.append($newCardTitleText);
+	$newCardTitle.append($newCardFilterButton);
+	$newCardTitle.append($dropDownMenu);
+	$newCard.append($newCardTitle);
+	$newCard.append($canvas);
+	$newGridCont.append($newCard);
+	//$chartsCont.append($newGridCont);
+	var ctx = $canvas[0].getContext('2d')
+	console.log(data);
+	if(data["Type"] == "Bar"){
+		newBarChart(ctx,data);
+	}
+	if(data["Type"] == "Line"){
+		newLineChart(ctx,data);
+	}
+	return $newGridCont;
+}
