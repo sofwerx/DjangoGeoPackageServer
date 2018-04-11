@@ -444,6 +444,12 @@ window.zoomTo = function(minX, minY, maxX, maxY, projection) {
   }
 }
 
+//Get Relation Content
+/**
+* This Function is basically a catch all for generating most MIME type content
+* It also generates special content related to the x-SOFWERX-timeseries0001 protocol
+*
+*/
 function getRelationContent(data,relTableName){
 	let retListArray = [];
 	console.log(data);
@@ -453,7 +459,7 @@ function getRelationContent(data,relTableName){
 	let graphData = {};
 	//="highlightFeature({{id}}, '{{tableName}}')"
 	for(let index in data){
-		console.log(data[index]);
+		//console.log(data[index]);
 		if(data[index].content_type!=undefined && data[index].content_type.startsWith("image")){
 			//Need to make a better data management structure, potential memory leak here if browser doesn't handle unused memory correctly
 			let blobURI = URL.createObjectURL(new Blob( [ data[index].data ], { type: data[index].content_type } ));
@@ -463,14 +469,51 @@ function getRelationContent(data,relTableName){
 			$newListItem.append($newImage);
 			retListArray.push($newListItem);
 		}
-		else if(data[index].type!=undefined && data[index].type.startsWith("graph")){
-			//for now let's assume its the timestamp graph
-			//console.log("Hello");
-			peopleCount = JSON.parse(data[index].propertyDict).people || 0;
+		else if(data[index].content_type!=undefined && data[index].content_type.startsWith("audio")){
+			//Need to make a better data management structure, potential memory leak here if browser doesn't handle unused memory correctly
+			let blobURI = URL.createObjectURL(new Blob( [ data[index].data ], { type: data[index].content_type } ));
+			//console.log(blobURI);
+			$newListItem = $("<li>",{class:"list-group-item text-center"});
+			$newAudio = $("<audio />",{controls:"true",width:"100%",height:"50px"});
+			$newSource = $("<source />",{src:blobURI, type: data[index].content_type});
+			$newListItem.append($("<h4/>",{text: data[index].content_type.substring( data[index].content_type.indexOf('/') + 1 )}));
+			$newAudio.append($newSource);
+			$newListItem.append($newAudio);
+			retListArray.push($newListItem);
+		}
+		else if(data[index].content_type!=undefined && data[index].content_type.startsWith("text")){
+			if (data[index].content_type.endsWith("html")){
+				$newListItem = $("<li>",{class:"list-group-item text-center",html:new TextDecoder("utf-8").decode(data[index].data)});
+			}else{
+				$newListItem = $("<li>",{class:"list-group-item text-center",text:new TextDecoder("utf-8").decode(data[index].data)});
+			}
+			
+			retListArray.push($newListItem);
+		}
+		else if(data[index].content_type!=undefined && data[index].content_type.startsWith("video")){
+			//Need to make a better data management structure, potential memory leak here if browser doesn't handle unused memory correctly
+			let blobURI = URL.createObjectURL(new Blob( [ data[index].data ], { type: data[index].content_type } ));
+			//console.log(blobURI);
+			$newListItem = $("<li>",{class:"list-group-item text-center"});
+			$newVideo = $("<video />",{controls:"true",width:"100%",height:"300px"});
+			$newSource = $("<source />",{src:blobURI, type: data[index].content_type});
+			$newVideo.append($newSource);
+			$newListItem.append($newVideo);
+			retListArray.push($newListItem);
+		}
+		else if(data[index].content_type!=undefined && data[index].content_type.startsWith("application")){
+			let blobURI = URL.createObjectURL(new Blob( [ data[index].data ], { type: data[index].content_type } ));
+			$newListItem = $("<li>",{class:"list-group-item text-center"});
+			$newListItem.append($("<h4/>",{text:"PDF File", onclick:"var link = document.createElement('a');link.href = '"+blobURI+"';link.download='file.pdf';link.click();"}));
+			retListArray.push($newListItem);
+		}
+		else if(data[index].type!=undefined && data[index].type == "x-SOFWERX-timeseries0001"){
+			
+			playCount = data[index].playtimes || 0;
 			graphlabel.push(new Date(data[index]["timestamp"]).toString().split(" ")[4]);
-			graphTData.push(peopleCount);
+			graphTData.push(playCount);
 			if(index == data.length-1){
-				graphData["Title"] = "People Seen"
+				graphData["Title"] = "Times Played With"
 				graphData["Type"] = "Line";
 				graphData["Label"] = graphlabel;
 				graphData["Data"] = graphTData;

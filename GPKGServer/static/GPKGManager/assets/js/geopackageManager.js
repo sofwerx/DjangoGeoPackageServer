@@ -158,6 +158,8 @@ function showInfoModal(elementToCopy){
 	$("#showInfoModal").find(".modal-body").append($clone.removeAttr('style'));
 	jQuery("#showInfoModal").modal("show");
 }
+
+//This Creates a new Bar chart with the supplied data
 function newBarChart(ctx,data){
 	var myChart = new Chart(ctx, {
 		type: 'bar',
@@ -182,6 +184,8 @@ function newBarChart(ctx,data){
 		}
 	});
 }
+
+//This Creates a new Line chart with the supplied data
 function newLineChart(ctx,data){
 	var myLineChart = new Chart(ctx, {
 		type: 'line',
@@ -206,6 +210,10 @@ function newLineChart(ctx,data){
 	});
 }
 
+/*
+* This will make the container for a chart with the data. 
+* The data will be in the format : {Title: string, Label:string[], data: int[], and Type: "Bar" || "Line" }
+*/
 function generateChart(data){
 	$newGridCont = $("<div>",{class:"mt-1 col-md-12"});
 	$newCard = $("<div>",{class:"card card-body"});
