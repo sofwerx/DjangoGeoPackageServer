@@ -656,20 +656,20 @@ function pointToLayer(feature, latlng) {
 }
 
 function pointStyle(feature) {
-  var radius = 2;
+  var radius = 6;
   var size = 26;
   if (feature.properties['marker-size']) {
     switch(feature.properties['marker-size']) {
       case 'small':
-        radius = 2;
+        radius = 6;
         size = 26;
         break;
       case 'medium':
-        radius = 4;
+        radius = 8;
         size = 32;
         break;
       case 'large':
-        radius = 6;
+        radius = 12;
         size = 38;
         break;
     }
