@@ -75,7 +75,8 @@ class GPKGLeafletEditor {
 		console.log(type);
 		if (type === 'marker') {
 			layer.bindPopup('A popup!');
-			GeoPackageAPI.addGeoJSONFeatureToGeoPackage(geoPackage, new L.geoJSON(e.layer.toGeoJSON()), tObj, function(){console.log("Hello");});
+			//GeoPackageAPI.addGeoJSONFeatureToGeoPackage(geoPackage, new L.geoJSON(e.layer.toGeoJSON()), tObj, function(){console.log("Hello");});
+			tObj.addFeature();
 		}
 		if (type === 'circlemarker') {
 			layer.bindPopup('A popup!');
@@ -96,6 +97,20 @@ class GPKGLeafletEditor {
   startTileEdit() {
 	//Coming soon
     //return this.height * this.width;
+  }
+  addFeature(){
+     geoPackage.getFeatureDaoWithTableName(this.tableName, function(err, featureDao) {
+        var featureRow = featureDao.newRow();
+        //var geometryData = new GeometryData();
+        geometryData.setSrsId(4326);
+        var point = new wkx.Point(1, 2);
+        geometryData.setGeometry(point);
+        featureRow.setGeometry(geometryData);
+
+        featureDao.create(featureRow, function(err, result) {
+          console.log("Created");
+        });
+      });
   }
 }
 
@@ -143,7 +158,6 @@ gpkgDrawControl = new GPKGLeafletEditor(FeatureOptions,null,map);
 function EditFeatureTable(table, btnObj){
 	if(!tableLayers[table]){
 		toggleLayer('feature', table);
-		$("#myonoffswitch-" + table)[0].checked = true;
 	}
 	
 	gpkgDrawControl.startFeatureEdit(table);

@@ -14,6 +14,11 @@ def home(request):
 	c = {'geopackages':GeoPackage.objects.all()}
 	return render(request, 'homePage.html', c)
 
+@csrf_protect
+def piStream(request):
+	c = {'geopackages':GeoPackage.objects.all()}
+	return render(request, 'piPage.html', c)
+
 
 def retrieveGPKG(request):
 	gpkg = GeoPackage.objects.filter(id=request.GET.get("id")).first()

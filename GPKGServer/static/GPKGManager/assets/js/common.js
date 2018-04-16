@@ -364,7 +364,14 @@ function readGeoPackage(callback) {
         async.eachSeries(tables, function(table, callback) {
           geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
             geoPackage.getInfoForTable(tileDao, function(err, info) {
+			  let tableWords = info.tableName.split("_");
+				for (let word in tableWords) {
+					tableWords[word] = tableWords[word].charAt(0).toUpperCase() + tableWords[word].substr(1);
+				}
+			  info["displayName"] = tableWords.join(" ");
               tableInfos[table] = info;
+			  
+			  
               tableDaos[table] = tileDao;
               var rendered = Mustache.render(tileTableTemplate, info);
               tileTableNode.append(rendered);
@@ -381,7 +388,13 @@ function readGeoPackage(callback) {
               return callback();
             }
             geoPackage.getInfoForTable(featureDao, function(err, info) {
+			  let tableWords = info.tableName.split("_");
+				for (let word in tableWords) {
+					tableWords[word] = tableWords[word].charAt(0).toUpperCase() + tableWords[word].substr(1);
+				}
+			  info["displayName"] = tableWords.join(" ");
               tableInfos[table] = info;
+				
               tableDaos[table] = featureDao;
               var rendered = Mustache.render(featureTableTemplate, info);
               featureTableNode.append(rendered);
@@ -453,19 +466,21 @@ window.zoomTo = function(minX, minY, maxX, maxY, projection) {
 function getRelationContent(data,relTableName){
 	let retListArray = [];
 	console.log(data);
-	
+	pictures = [];
 	let graphlabel=[];
 	let graphTData=[];
 	let graphData = {};
 	//="highlightFeature({{id}}, '{{tableName}}')"
+	//$('.your-class').slick({setting-name: setting-value});
 	for(let index in data){
 		//console.log(data[index]);
 		if(data[index].content_type!=undefined && data[index].content_type.startsWith("image")){
 			//Need to make a better data management structure, potential memory leak here if browser doesn't handle unused memory correctly
 			let blobURI = URL.createObjectURL(new Blob( [ data[index].data ], { type: data[index].content_type } ));
 			//console.log(blobURI);
+			pictures.push(blobURI);
 			$newListItem = $("<li>",{class:"list-group-item text-center"});
-			$newImage = $("<img />",{src:blobURI, width:"100%","max-height":"300px"});
+			$newImage = $("<img />",{src:blobURI, class:"img img-responsive",width:"100%","max-height":"300px"});
 			$newListItem.append($newImage);
 			retListArray.push($newListItem);
 		}
@@ -504,7 +519,7 @@ function getRelationContent(data,relTableName){
 		else if(data[index].content_type!=undefined && data[index].content_type.startsWith("application")){
 			let blobURI = URL.createObjectURL(new Blob( [ data[index].data ], { type: data[index].content_type } ));
 			$newListItem = $("<li>",{class:"list-group-item text-center"});
-			$newListItem.append($("<h4/>",{text:"PDF File", onclick:"var link = document.createElement('a');link.href = '"+blobURI+"';link.download='file.pdf';link.click();"}));
+			$newListItem.append($("<h2/>",{class:"btn btn-info large", html:"<i class='fa fa-download'></i> PDF File", onclick:"var link = document.createElement('a');link.href = '"+blobURI+"';link.download='file.pdf';link.click();"}));
 			retListArray.push($newListItem);
 		}
 		else if(data[index].type!=undefined && data[index].type == "x-SOFWERX-timeseries0001"){
@@ -527,6 +542,7 @@ function getRelationContent(data,relTableName){
 			retListArray.push($newListItem);
 		}
 	}
+	console.log(retListArray);
 	return retListArray;
 }
 
@@ -567,8 +583,10 @@ window.toggleLayer = function(layerType, table) {
   if (tableLayers[table]) {
     map.removeLayer(tableLayers[table]);
     delete tableLayers[table];
+    $("#"+layerType+"-"+table).removeClass("toggled");
     return;
   }
+  $("#"+layerType+"-"+table).addClass("toggled");
 
   if (layerType === 'tile') {
     ga('send', {

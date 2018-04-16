@@ -15,6 +15,8 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/css/mdb.min.css">	
 	<link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css">	
 	<link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">	
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">	
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css">	
 	<link rel="stylesheet" href="/static/GPKGManager/assets/css/styles.min.css">
 	<link rel="stylesheet" href="/static/GPKGManager/assets/css/app.css">
 	<link rel="stylesheet" href="/static/custom/css/styles.css">
@@ -52,7 +54,7 @@
             <div class="loader-section section-right"></div>
 
 		</div>
-		<div class="col-lg-6" style="padding:0px;"><div id="map"></div></div>
+		<div class="col-md	-8" style="padding:0px;"><div id="map"></div></div>
 		<div class="col scrollVert" style="padding:0;margin:0;">
 			<div>
 				<ul class="nav nav-tabs">
@@ -60,24 +62,23 @@
 					<li class="nav-item"><a id="EditingTab" class="nav-link" role="tab" data-toggle="tab" href="#tab-2">Editing</a></li>
 				</ul>
 				<div class="tab-content">
-					<div class="tab-pane active p-1" role="tabpanel" id="tab-1">
-						<div class="control-fileupload col-12 m-2 text-center">
+					<div class="tab-pane active p-0" role="tabpanel" id="tab-1">
+						<div class="control-fileupload col-12  text-center">
 						  <input type="file" name="file" id="file" class="inputfile" onchange="loadGeoPackage(this.files)"/>
-						  <label id="choose-label" class="" for="file"><span>Upload a Geopackage </span><i style="display: none;" class="fa fa-spinner fa-pulse"></i></label>
+						  <label id="choose-label" class="btn btn-outline-info col-11" for="file"><span><i class="fas fa-upload" aria-hidden="true"></i> Upload a Geopackage </span></label>
 						<div id="myProgress">
 							<p>Uploading GeoPackage</p>
 							<div id="myBar"></div>
 						</div>
 						</div>
-						<hr>
+						<br>
 						<h3 class="col-xs-12 text-center">List of Saved Geopackages</h3>
 						<ul class="list-group" id="listOfPackages">
 						  {% for gpkg in geopackages %}<a href="#" class="list-group-item waves-effect" onclick="loadSavedPackage({{gpkg.id}})">{{gpkg.name | title}}</a>{% endfor %}
 						</ul>
-						<hr>
-						<div class="col-12 text-center">
+						<!--<div class="col-12 text-center">
 							<button class="btn btn-outline-info col-11" onclick="saveGeoPackage()"><i class="fa fa-download" aria-hidden="true"></i> Download Geopackage</button>
-						</div>
+						</div>--> 
 					</div>
 					<div class="tab-pane" role="tabpanel" id="tab-2">
 						<div id="parsingTaskCont" class="pt-1 text-center col-xs-12">
@@ -87,17 +88,16 @@
 							</div>
 						</div>
 						<div id="information" class="information hidden">
-						  <hr>
+							<div class="col-12 text-center">
+								<button class="btn btn-outline-info col-11" onclick="saveGeoPackage()"><i class="fa fa-download" aria-hidden="true"></i> Download Geopackage</button>
+							</div><br>
+							<h3 class="col-12 text-center"> List of Tables</h3>
 						  <div class="tableGroup">
 							<div id="tile-tables"></div>
 						  </div>
 						  <div class="tableGroup">
 							<div id="feature-tables"></div>
 						  </div>
-						</div>
-						<hr>
-						<div class="col-12 text-center">
-							<button class="btn btn-outline-info col-11" onclick="saveGeoPackage()"><i class="fa fa-download" aria-hidden="true"></i> Download Geopackage</button>
 						</div>
 					</div>
 				</div>
@@ -107,9 +107,9 @@
 	<div class="footer-basic" style="padding:20px 0px;bottom:0;position:absolute;width:100%;">
 		<footer>
 			<ul class="list-inline">
-				<li class="list-inline-item"><a href="http://www.opengeospatial.org/">OGC</a></li>
-				<li class="list-inline-item"><a href="https://github.com/ngageoint/geopackage-js">GeoPackage JS</a></li>
-				<li class="list-inline-item"><a href="#No Link Here though">GeoPackage Server</a></li>
+				<li class="list-inline-item"><a href="http://www.opengeospatial.org/" target="_blank">OGC</a></li>
+				<li class="list-inline-item"><a href="https://github.com/ngageoint/geopackage-js" target="_blank">GeoPackage JS</a></li>
+				<li class="list-inline-item"><a href="https://github.com/sofwerx/DjangoGeoPackageServer" target="_blank">GeoPackage Server</a></li>
 			</ul>
 		</footer>
 	</div>
@@ -161,82 +161,81 @@
 	
 	
 
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
 	<script src="/static/GPKGManager/assets/js/gp.js"></script>    
 	<script src="/static/GPKGManager/assets/js/common.js"></script>    
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.js"></script>
 	<script src="/static/GPKGManager/assets/js/geopackageManager.js"></script>
 	{% verbatim %}
 	<script id="feature-table-template" type="x-tmpl-mustache">
-	<div>
-	<div class="" style="display: inline-block;">
-	  <input type="checkbox" name="onoffswitch-{{tableName}}" class="onoffswitch-checkbox" id="myonoffswitch-{{tableName}}" onchange="toggleLayer('feature', '{{tableName}}')">
-	  <label class="onoffswitch-label" for="myonoffswitch-{{tableName}}">
-		<span class="onoffswitch-inner"></span>
-	  </label>
+	<div class="border p-1" id="feature-{{tableName}}">
+	<div class="table-name col-12" style="display: inline-block;"> 
+		<h4>{{displayName}}</h4>
+		<a  href="javascript:void(0);" class="btn btn-large toggleBtn text-center p-2  pl-4 pr-4 btn-rounded" data-toggle="tooltip" data-placement="top" title="Click to View/Hide Layer" onclick="toggleLayer('feature', '{{tableName}}')"><i class="whenToggled fa fa-eye fa-3x"></i><i class="whenUnToggled fa fa-eye-slash fa-3x"></i> </a> 
+		<a  href="javascript:void(0);" class="btn btn-large btn-info text-center p-2 btn-rounded" data-toggle="tooltip" data-placement="top" title="Click to Zoom on Map" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{contents.srs.organization}}:{{contents.srs.organization_coordsys_id}}')"><i class="fa fa-search"></i></a>
+		<a class="btn btn-info p-2 editLayerButton" href="javascript:void(0);" onclick="EditFeatureTable('{{tableName}}', $(this))"><i class="fa fa-edit"></i> Edit This Layer</a>
+
+		<!--<a style="btn btn-info p-2" href="javascript:void(0);" onclick="downloadGeoJSON('{{tableName}}')"><i class="fa fa-download"></i> GeoJSON</a>-->
+		<a class="btn btn-info p-2" href="javascript:void(0);" onclick="showInfoModal($(this).next())">View Extra Data</a>
+		<div class="table col-12" style="display: none;">
+		  <div class="tab active" style="display: inline-block;" onclick="$(this).parent().find('.metadata').show(); $(this).parent().find('.features').hide();; $(this).parent().find('.tab').toggleClass('active');">Metadata</div>
+		  <div class="tab" style="display: inline-block;" onclick="$(this).parent().find('.features').show(); $(this).parent().find('.metadata').hide(); loadFeatures('{{tableName}}', $(this).parent().find('.features')); $(this).parent().find('.tab').toggleClass('active');">Features</div>
+		  <div class="metadata">
+			<div class="contents">
+			  <div class="section-title"><h4>Description</h4></div>
+			  <div class="section">
+				<p>{{contents.description}}</p>
+			  </div>
+			</div>
+
+			<div class="geometryColumns">
+			  <div class="section-title"><h4>Geometry Columns</h4></div>
+			  <div class="section">
+				<div class="item"><span class="label">Geometry Type Name: </span><span class="value">{{geometryColumns.geometryTypeName}}</span></div>
+			  </div>
+			</div>
+			<div class="columns">
+			  <div class="section-title"><h4>Columns</h4></div>
+			  <table class="table">
+				  <thead>
+					<tr>
+					  <th scope="col">Index</th>
+					  <th scope="col">Name</th>
+					  <th scope="col">Type</th>
+					  <th scope="col">Required</th>
+					</tr>
+				  </thead>
+				  <tbody>
+					{{#columns}}
+					<tr>
+						<th>{{index}}</th>
+						<th>{{name}}</th>
+						<th>{{dataType}}</th>
+						<th>{{notNull}}</th>
+					</tr>
+
+					  {{#dataColumn}}
+					  <tr>
+						  <th>Data Name: {{dataColumn.name}}</th>
+						  <th>Data Title: {{dataColumn.title}}</th>
+						  <th>Data Description: {{dataColumn.description}}</th>
+						  <th>Data Type: {{dataColumn.mime_type}}</th>
+					  </tr>
+					  {{/dataColumn}}
+					{{/columns}}
+				  </tbody>
+				</table>
+			</div>
+		  </div>
+		  <div class="features" style="display: none;">
+		  </div>
+		</div>
 	</div>
-	<div id="feature-{{tableName}}" class="table-name" style="display: inline-block;">Feature Table: {{tableName}} (<span class="count">{{count}}</span>) <a  href="javascript:void(0);" class="btn btn-info text-center p-2 btn-rounded" data-toggle="tooltip" data-placement="top" title="Click to Zoom on Map" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{contents.srs.organization}}:{{contents.srs.organization_coordsys_id}}')"><i class="fa fa-search"></i></a><a style="padding-left: 7px" href="javascript:void(0);" onclick="downloadGeoJSON('{{tableName}}')">Download Layer as GeoJSON</a></div>
 	<br>
-	<a class="btn col-5 btn-info p-2 editLayerButton" href="javascript:void(0);" onclick="EditFeatureTable('{{tableName}}', $(this))">Edit This Layer</a>
-	<span class="col-2 m-0"></span>
-	<a class="btn col-5 btn-info p-2" href="javascript:void(0);" onclick="showInfoModal($(this).next())">View Extra Data</a>
-	<div class="table" style="display: none;">
-	  <div class="tab active" style="display: inline-block;" onclick="$(this).parent().find('.metadata').show(); $(this).parent().find('.features').hide();; $(this).parent().find('.tab').toggleClass('active');">Metadata</div>
-	  <div class="tab" style="display: inline-block;" onclick="$(this).parent().find('.features').show(); $(this).parent().find('.metadata').hide(); loadFeatures('{{tableName}}', $(this).parent().find('.features')); $(this).parent().find('.tab').toggleClass('active');">Features</div>
-	  <div class="metadata">
-		<div class="contents">
-		  <div class="section-title"><h4>Description</h4></div>
-		  <div class="section">
-			<p>{{contents.description}}</p>
-		  </div>
-		</div>
-
-		<div class="geometryColumns">
-		  <div class="section-title"><h4>Geometry Columns</h4></div>
-		  <div class="section">
-			<div class="item"><span class="label">Geometry Type Name: </span><span class="value">{{geometryColumns.geometryTypeName}}</span></div>
-		  </div>
-		</div>
-		<div class="columns">
-		  <div class="section-title"><h4>Columns</h4></div>
-		  <table class="table">
-			  <thead>
-				<tr>
-				  <th scope="col">Index</th>
-				  <th scope="col">Name</th>
-				  <th scope="col">Type</th>
-				  <th scope="col">Required</th>
-				</tr>
-			  </thead>
-			  <tbody>
-				{{#columns}}
-				<tr>
-					<th>{{index}}</th>
-					<th>{{name}}</th>
-					<th>{{dataType}}</th>
-					<th>{{notNull}}</th>
-				</tr>
-
-				  {{#dataColumn}}
-				  <tr>
-					  <th>Data Name: {{dataColumn.name}}</th>
-					  <th>Data Title: {{dataColumn.title}}</th>
-					  <th>Data Description: {{dataColumn.description}}</th>
-					  <th>Data Type: {{dataColumn.mime_type}}</th>
-				  </tr>
-				  {{/dataColumn}}
-				{{/columns}}
-			  </tbody>
-			</table>
-		</div>
-	  </div>
-	  <div class="features" style="display: none;">
-	  </div>
-	</div>
-	<hr>
 	</div>
 </script>
 	<script id="all-features-template" type="x-tmpl-mustache">
-	<table class="table" onmouseout="clearHighlights()">
+	<table class="table col-12" onmouseout="clearHighlights()">
 	  <thead>
 		<tr>
 		  <th></th>
@@ -256,16 +255,15 @@
 	</table>
 </script>
 	<script id="tile-table-template" type="x-tmpl-mustache">
-	<div>
-	<div class="onoffswitch" style="display: inline-block;">
-	  <input type="checkbox" name="onoffswitch-{{tableName}}" class="onoffswitch-checkbox" id="myonoffswitch-{{tableName}}" onchange="toggleLayer('tile', '{{tableName}}')">
-	  <label class="onoffswitch-label" for="myonoffswitch-{{tableName}}">
-		<span class="onoffswitch-inner"></span>
-	  </label>
-	</div>
-	<div id="tile-{{tableName}}" class="table-name pt-0" style="display: inline-block;"><h4>{{tableName}} (<span class="small">Zoom: {{minZoom}} - {{maxZoom}}</span>)  <a href="javascript:void(0);" class="btn btn-info text-center p-2 btn-rounded" data-toggle="tooltip" data-placement="top" title="Click to Zoom on Map" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{contents.srs.organization}}:{{contents.srs.organization_coordsys_id}}')"><i class="fa fa-search"></i></a></h4></div>
-	<br>
-	<a class="btn col-12 btn-info p-1" href="javascript:void(0);" onclick="$(this).next().toggle()">Edit Layer</a>
+	<div class="border p-1" id="tile-{{tableName}}">
+	<div class="table-name col-12" style="display: inline-block;">
+	<h4>{{displayName}} (<span class="small">Zoom: {{minZoom}} - {{maxZoom}}</span>)</h4>  
+	
+	<a  href="javascript:void(0);" class="btn btn-large toggleBtn text-center p-2  pl-4 pr-4 btn-rounded" data-toggle="tooltip" data-placement="top" title="Click to View/Hide Layer" onclick="toggleLayer('tile', '{{tableName}}')"><i class="whenToggled fa fa-eye fa-3x"></i><i class="whenUnToggled fa fa-eye-slash fa-3x"></i> </a> 
+	<a  href="javascript:void(0);" class="btn btn-large btn-info text-center p-2 btn-rounded" data-toggle="tooltip" data-placement="top" title="Click to Zoom on Map" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{contents.srs.organization}}:{{contents.srs.organization_coordsys_id}}')"><i class="fa fa-search"></i></a>
+	<a class="btn btn-info p-2 editLayerButton" href="javascript:void(0);" onclick="EditTileTable('{{tableName}}', $(this))"><i class="fa fa-edit"></i> Edit This Layer</a>
+
+	<a class="btn btn-info p-2" href="javascript:void(0);" onclick="showInfoModal($(this).next())">View Extra Data</a>
 	<div class="table" style="display: none;">
 	  <div class="tab metadata-tab active" style="display: inline-block;" onclick="$(this).parent().find('.metadata').show(); $(this).parent().find('.tileListing').hide(); $(this).parent().find('.metadata-tab').addClass('active'); $(this).parent().find('.tile-tab').removeClass('active'); unregisterTileTable('{{tableName}}')">Metadata</div>
 	  <div class="tab tile-tab" style="display: inline-block;" onclick="$(this).parent().find('.tileListing').show(); $(this).parent().find('.metadata').hide(); loadZooms('{{tableName}}', $(this).parent().find('.tileListing')); $(this).parent().find('.tile-tab').addClass('active'); $(this).parent().find('.metadata-tab').removeClass('active'); registerTileTable('{{tableName}}', $(this).parent().find('.tileListing'));">Tiles</div>
@@ -312,7 +310,6 @@
 	  <div class="tileListing">
 	  </div>
 	</div>
-	<hr>
 	</div>
 </script>
 	<script id="tile-zoom-levels-template" type="x-tmpl-mustache">

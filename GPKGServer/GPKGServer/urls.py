@@ -20,6 +20,7 @@ from django.conf.urls.static import static
 import views, settings
 urlpatterns = [
     url(r'^$', views.home),
+    url(r'^pi/$', views.piStream),
     url(r'^retrieve/$', views.retrieveGPKG),
     url(r'^createGeoPackage/$', views.createGeoPackage),
     url(r'^prototype/$', views.prototype),
