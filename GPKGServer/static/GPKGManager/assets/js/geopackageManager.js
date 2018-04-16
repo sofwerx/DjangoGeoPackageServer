@@ -85,18 +85,34 @@ class GPKGLeafletEditor {
 		//editableLayers.addLayer(layer);
 	});
 	this.tableName = "";
+	this.tableType = "";
 
+  }
+  removeControls(){
+	if(this.FeatureControl){
+		this.map.removeControl(this.FeatureControl);
+	}
+	if(this.TileControl){
+		this.map.removeControl(this.TileControl);
+	}
   }
   startFeatureEdit(tableName = "") {
 	if(this.map != null){
+		this.removeControls();
 		this.map.addControl(this.FeatureControl);
-		//this.map.removeControl(this.TileControl);
 		this.tableName = tableName;
+		this.tableType = "Feature";
 	}
   }
-  startTileEdit() {
+  startTileEdit(tableName = "") {
 	//Coming soon
-    //return this.height * this.width;
+    //return this.height * this.width; What?
+	if(this.map != null){
+		this.removeControls();
+		//this.map.addControl(this.TileControl);
+		this.tableName = tableName;
+		this.tableType = "Tile";
+	}
   }
   addFeature(){
      geoPackage.getFeatureDaoWithTableName(this.tableName, function(err, featureDao) {
@@ -161,6 +177,16 @@ function EditFeatureTable(table, btnObj){
 	}
 	
 	gpkgDrawControl.startFeatureEdit(table);
+	$(".editLayerButton").removeClass("active");
+	$(btnObj).addClass("active");
+}
+
+function EditTileTable(table, btnObj){
+	if(!tableLayers[table]){
+		toggleLayer('tile', table);
+	}
+	
+	gpkgDrawControl.startTileEdit(table);
 	$(".editLayerButton").removeClass("active");
 	$(btnObj).addClass("active");
 }

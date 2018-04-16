@@ -216,6 +216,9 @@ th {
 .whenUnToggled, .toggled .whenToggled{
 	display:block;
 }
+.toggled{
+	background-color: rgba(75,175,200,.07);
+}
 .toggled .toggleBtn{
 	background-color: #33b5e5;
 }
