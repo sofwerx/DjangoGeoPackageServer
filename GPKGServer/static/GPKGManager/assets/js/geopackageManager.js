@@ -45,16 +45,16 @@ function loadSavedPackage(id){
 	
 	$("#EditingTab")[0].click();
 	$.ajax({
-		  type: "Get",
-		  url: "/retrieve/?id=" + id,
-		  success: function(json){
-			  console.log("Successful Load");
-			  console.log(json);
-			  var fullLink = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '') + json.url;
-			  //console.log(full);
-			  loadUrl(fullLink);
-		  },
-		});
+	  type: "Get",
+	  url: "/retrieve/?id=" + id,
+	  success: function(json){
+		  console.log("Successful Load");
+		  console.log(json);
+		  var fullLink = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '') + json.url;
+		  //console.log(full);
+		  loadUrl(fullLink);
+	  },
+	});
 }
 
 var editableLayers = new L.FeatureGroup();
@@ -74,9 +74,10 @@ class GPKGLeafletEditor {
 			layer = e.layer;
 		console.log(type);
 		if (type === 'marker') {
-			layer.bindPopup('A popup!');
-			//GeoPackageAPI.addGeoJSONFeatureToGeoPackage(geoPackage, new L.geoJSON(e.layer.toGeoJSON()), tObj, function(){console.log("Hello");});
-			tObj.addFeature();
+			GeoPackageAPI.addGeoJSONFeatureToGeoPackage(geoPackage, e.layer.toGeoJSON(), tObj.tableName, function(newFeat){console.log(newFeat);});
+//			layer.setOptions({style:featureStyle});
+//			let content = generatePopupContent(feature,tObj.tableName);
+//			layer.bindPopup(content,{maxWidth : 660});
 		}
 		if (type === 'circlemarker') {
 			layer.bindPopup('A popup!');
@@ -114,20 +115,6 @@ class GPKGLeafletEditor {
 		this.tableType = "Tile";
 	}
   }
-  addFeature(){
-     geoPackage.getFeatureDaoWithTableName(this.tableName, function(err, featureDao) {
-        var featureRow = featureDao.newRow();
-        //var geometryData = new GeometryData();
-        geometryData.setSrsId(4326);
-        var point = new wkx.Point(1, 2);
-        geometryData.setGeometry(point);
-        featureRow.setGeometry(geometryData);
-
-        featureDao.create(featureRow, function(err, result) {
-          console.log("Created");
-        });
-      });
-  }
 }
 
 
@@ -144,22 +131,8 @@ var MyCustomMarker = L.Icon.extend({
 var FeatureOptions = {
 	position: 'topright',
 	draw: {
-		polyline: {
-			shapeOptions: {
-				color: '#f357a1',
-				weight: 10
-			}
-		},
-		polygon: {
-			allowIntersection: false, // Restricts shapes to simple polygons
-			drawError: {
-				color: '#e1e100', // Color the shape will turn when intersects
-				message: '<strong>Oh snap!<strong> you can\'t draw that!' // Message that will show when intersect
-			},
-			shapeOptions: {
-				color: '#bada55'
-			}
-		},
+		polyline: false,
+		polygon: false,
 		circle: false, // Turns off this drawing tool
 		circlemarker: false, 
 		rectangle: false,

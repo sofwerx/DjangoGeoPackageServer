@@ -571,9 +571,17 @@ function popupRelationsModal(tableName,id){
 
 function generatePopupContent(feature,table){
 	$container = $("<div/>",{});
+	
 	$button = $("<button />",{class:"btn btn-default",text:"View Related Data",onclick:"popupRelationsModal('"+table+"',"+feature["id"]+")"});
-	$container.append($button);
+	$hr = $("<hr />");
+	$deletebtn = $("<button />",{class:"btn btn-danger",text:"Delete Point",onclick:"deleteFeature('"+table+"',"+feature["id"]+")"});
+	
+	$container.append($deletebtn, $hr,$button);
 	return $container.html();
+}
+
+function deleteFeature(tableName, id){
+	tableDaos[tableName].deleteById(id, function(){console.log("Tried to delete "+id+" from "+tableName)});
 }
 
 //Toggle Layer
@@ -632,11 +640,12 @@ window.toggleLayer = function(layerType, table) {
           var string = "";
 		  let content = undefined;
 		  //console.log(feature);
+		  content = generatePopupContent(feature,table);
           for (var key in feature.properties) {
             //string += '<div class="item"><span class="label">' + key + ': </span><span class="value">' + feature.properties[key] + '</span></div>';
-			content = generatePopupContent(feature,table);
           }
-          layer.bindPopup(content);
+			
+          layer.bindPopup(content,{maxWidth : 660});
         },
         coordsToLatLng: function(coords) {
           // if (coords[0] < 0) {
