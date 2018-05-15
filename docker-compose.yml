@@ -2,6 +2,8 @@ version: '2.0'
 
 volumes:
 
+  django-geopackage-server_data:
+    driver: local
   django-geopackage-server-media:
     driver: local
 
@@ -13,5 +15,6 @@ services:
     ports:
       - 7999:7999
     volumes:
+      - django-geopackage-server_data:/data
       - django-geopackage-server-media:/app/GPKGServer/media
 
