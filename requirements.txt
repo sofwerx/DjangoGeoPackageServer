@@ -2,6 +2,6 @@ Django==1.11.11
 django-crispy-forms==1.6.1
 django-extensions==1.7.5
 django-npm==1.0.0
-djangorestframework==3.5.3
+djangorestframework==3.9.1
 pytz==2018.3
 six==1.11.0
